@@ -1,7 +1,6 @@
 #!/bin/bash
 
-#Edit PATH_GNL variable to the path to your gnl
-PATH_GNL=".."
+PATH_GNL="../gnl_bonus"
 
 rm results/result_log.txt
 rm results/result_log_bonus.txt
@@ -103,6 +102,34 @@ else
 	compare_output test_files/long-clear
 	compare_output test_files/doomed-to-fail
 
+	gcc -o tester -Wall -Wextra -Werror -D BUFFER_SIZE=12 ${PATH_GNL}/get_next_line.c ${PATH_GNL}/get_next_line_utils.c tests.c -L. -lft
+
+	echo
+	echo "Testing with bad line param ..."
+	echo
+	./tester null > gnl_output.txt
+	temp=$(diff test_files/empty gnl_output.txt)
+	if [[ -z "$temp" ]]; then
+		echo "SUCCESS with NULL line param"
+	elif [[ -n "$temp" ]]; then
+		echo "\033[0;31mFAILED with NULL line param\033[0m"
+		diff $1 gnl_output.txt >> results/result_log.txt
+	fi
+
+	echo
+	echo "Testing with stdin ..."
+	echo
+
+	cat test_files/easy | ./tester  > gnl_output.txt
+	temp=$(diff test_files/easy gnl_output.txt)
+	if [[ -z "$temp" ]]; then
+		echo "SUCCESS with stdin"
+	elif [[ -n "$temp" ]]; then
+		echo "\033[0;31mFAILED with stdin\033[0m"
+		diff test_files/easy gnl_output.txt >> results/result_log.txt
+	fi
+	rm gnl_output.txt
+
 	gcc -o tester -Wall -Wextra -Werror -D BUFFER_SIZE=0 ${PATH_GNL}/get_next_line.c ${PATH_GNL}/get_next_line_utils.c tests.c -L. -lft
 
 	echo
@@ -118,6 +145,7 @@ else
 	fi
 	rm gnl_output.txt
 
+
 	echo
 	echo "Testing finished"
 	echo "To test bonus, run sh run_tests.sh bonus"
@@ -126,9 +154,3 @@ fi
 
 rm get_next_line.h
 rm tester
-
-#Create path variable
-#Test bonus different file sizes
-#Test with too large buf size
-#Test with bad line
-#Test with 

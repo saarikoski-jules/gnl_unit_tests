@@ -2,24 +2,8 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include <unistd.h>
-#include <stdlib.h>
 #include "libft.h"
 #include "get_next_line.h"
-
-// #include ${PATH_GNL}"/get_next_line.h"
-// #include "../../libft_project/libft/libft.h"
-
-// void *ft_÷ßrealloc(void *ptr, size_t size);
-
-//Handle multiple file descriptors somehow or youll hella fail
-
-//TEst for different fds and different buf sizes
-
-//Do I want gnl to return an empty line if theres nothing in the file
-
-//do bonus with a two dimentional char array and create remainder in index fd of arr.
-
-//do i want to return an empty string or null for empty file
 
 void bonus_test_one()
 {
@@ -123,15 +107,12 @@ void bonus_tests(int test_num)
 
 }
 
-void basic_tests(char **args)
+void basic_tests(int fd)
 {
-	int fd;
 	int ret;
 	char *line;
-
 	ret = 1;
 	line = NULL;
-	fd = open(args[1], O_RDONLY);
 	while(ret == 1)
 	{
 		ret = get_next_line(fd, &line);
@@ -140,18 +121,39 @@ void basic_tests(char **args)
 			printf("\n");
 	}
 	if (ret != 0 && ret != 1)
-		printf("return value %d", ret);
+		printf("return value %d\n", ret);
 	close(fd);
 	if (get_next_line(fd, &line) != -1)
 		printf("Failed bad fd return value");
 }
 
+void null_test()
+{
+	int fd;
+
+	fd = open("test_files/standard", O_RDONLY);
+	if (get_next_line(fd, NULL) != -1)
+		printf("Failed with null line parameter");
+}
+
 int main(int amt, char **args)
 {
+	int fd;
+
 	if (amt == 3 && (ft_strncmp("bonus", args[1], 100000) == 0))
 		bonus_tests(ft_atoi(args[2]));
-	if (amt == 2 && (ft_strncmp("bonus", args[1], 100000) != 0))
-		basic_tests(args);
+	if (amt == 2 && (ft_strncmp("null", args[1], 100000) == 0))
+		null_test();
+	else if (amt == 2 && (ft_strncmp("bonus", args[1], 100000) != 0))
+	{
+		fd = open(args[1], O_RDONLY);
+		basic_tests(fd);
+	}
+	if (amt == 1)
+	{
+		fd = 0;
+		basic_tests(fd);
+	}
 	return (0);
 }
 
