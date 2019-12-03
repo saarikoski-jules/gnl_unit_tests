@@ -39,7 +39,7 @@ if [[ "$*" == "bonus" ]]; then
 
 	echo "Bonus tests finished"
 	echo "To test basic input: sh run_tests.sh"
-	echo "To see differences in output, see result_log_bonus.txt"
+	echo "To see differences in output, see result_log_bonus.txt in results/"
 
 else
 	compare_output() {
@@ -149,7 +149,7 @@ else
 	echo
 	echo "Testing finished"
 	echo "To test bonus, run sh run_tests.sh bonus"
-	echo "To see the differences in output, see result_log.txt"
+	echo "To see the differences in output, see result_log.txt in results/"
 fi
 
 rm get_next_line.h
