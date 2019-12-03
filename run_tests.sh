@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PATH_GNL="../gnl_bonus"
+PATH_GNL="../gnl_vogsphere"
 
 rm results/result_log.txt
 rm results/result_log_bonus.txt
