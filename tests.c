@@ -5,6 +5,14 @@
 #include "libft.h"
 #include "get_next_line.h"
 
+void print_result(char *line)
+{
+	if (line == NULL)
+		printf("\n");
+	else
+		printf("%s\n", line);
+}
+
 void bonus_test_one()
 {
 	int fd1;
@@ -16,13 +24,13 @@ void bonus_test_one()
 	fd2 = open("test_files/stuff", O_RDONLY);
 
 	get_next_line(fd1, &line);
-	printf("%s\n", line);
+	print_result(line);
 	get_next_line(fd1, &line);
-	printf("%s\n", line);
+	print_result(line);
 	get_next_line(fd2, &line);
-	printf("%s\n", line);
+	print_result(line);
 	get_next_line(fd1, &line);
-	printf("%s\n", line);
+	print_result(line);
 	close(fd1);
 	close(fd2);
 }
@@ -40,19 +48,19 @@ void bonus_test_two()
 	fd3 = open("test_files/data", O_RDONLY);
 
 	get_next_line(fd1, &line);
-	printf("%s\n", line);
+	print_result(line);
 	get_next_line(fd3, &line);
-	printf("%s\n", line);
+	print_result(line);
 	get_next_line(fd2, &line);
-	printf("%s\n", line);
+	print_result(line);
 	get_next_line(fd1, &line);
-	printf("%s\n", line);
+	print_result(line);
 	get_next_line(fd3, &line);
-	printf("%s\n", line);
+	print_result(line);
 	get_next_line(fd2, &line);
-	printf("%s\n", line);
+	print_result(line);
 	get_next_line(fd2, &line);
-	printf("%s\n", line);
+	print_result(line);
 	close(fd1);
 	close(fd2);
 	close(fd3);
@@ -71,23 +79,23 @@ void bonus_test_three()
 	fd3 = open("test_files/data", O_RDONLY);
 
 	get_next_line(fd1, &line);
-	printf("%s\n", line);
+	print_result(line);
 	get_next_line(fd3, &line);
-	printf("%s\n", line);
+	print_result(line);
 	get_next_line(fd2, &line);
-	printf("%s\n", line);
+	print_result(line);
 	get_next_line(fd1, &line);
-	printf("%s\n", line);
+	print_result(line);
 	get_next_line(fd3, &line);
-	printf("%s\n", line);
+	print_result(line);
 	get_next_line(fd2, &line);
-	printf("%s\n", line);
+	print_result(line);
 	get_next_line(fd2, &line);
-	printf("%s\n", line);
+	print_result(line);
 	get_next_line(fd1, &line);
-	printf("%s\n", line);
+	print_result(line);
 	get_next_line(fd2, &line);
-	printf("%s\n", line);
+	print_result(line);
 	close(fd1);
 	close(fd2);
 	close(fd3);
@@ -104,7 +112,6 @@ void bonus_tests(int test_num)
 		bonus_test_two();
 	if (test_num == 3)
 		bonus_test_three();
-
 }
 
 void basic_tests(int fd)
@@ -116,7 +123,8 @@ void basic_tests(int fd)
 	while(ret == 1)
 	{
 		ret = get_next_line(fd, &line);
-		printf("%s", line);
+		if (line != NULL)
+			printf("%s", line);
 		if (ret > 0)
 			printf("\n");
 	}

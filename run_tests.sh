@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PATH_GNL="../gnl_vogsphere"
+PATH_GNL="../jsaariko2"
 
 rm results/result_log.txt
 rm results/result_log_bonus.txt
@@ -23,7 +23,7 @@ if [[ "$*" == "bonus" ]]; then
 			echo "SUCCESS on bonus $1"
 		elif [[ -n "$temp" ]]; then
 			echo "\033[0;31mFAILED bonus $1\033[0m"
-			diff $1 gnl_output.txt >> results/result_log_bonus.txt
+			echo $temp >> results/result_log_bonus.txt
 		fi
 		rm gnl_output.txt
 	}
@@ -49,7 +49,7 @@ else
 			echo "SUCCESS $1"
 		elif [[ -n "$temp" ]]; then
 			echo "\033[0;31mFAILED: $1\033[0m"
-			diff $1 gnl_output.txt >> results/result_log.txt
+			echo $temp >> results/result_log.txt
 		fi
 		rm gnl_output.txt
 	}
