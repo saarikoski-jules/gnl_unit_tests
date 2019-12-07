@@ -36,9 +36,8 @@ void bonus_test_one()
 	char *line;
 	line = NULL;
 
-	fd1 = open("test_files/easy", O_RDONLY);
-	fd2 = open("test_files/stuff", O_RDONLY);
-	// dprintf(2, "Fd's: %d, %d\n", fd1, fd2);
+	fd1 = open("test_files/bonus-1", O_RDONLY);
+	fd2 = open("test_files/bonus-2", O_RDONLY);
 	get_next_line(fd1, &line);
 	print_result(line);
 	get_next_line(fd1, &line);
@@ -49,6 +48,8 @@ void bonus_test_one()
 	print_result(line);
 	empty_gnl(fd1);
 	empty_gnl(fd2);
+	close(fd1);
+	close(fd2);
 }
 
 void bonus_test_two()
@@ -59,10 +60,9 @@ void bonus_test_two()
 	char *line;
 	line = NULL;
 
-	fd1 = open("test_files/easy", O_RDONLY);
-	fd2 = open("test_files/stuff", O_RDONLY);
-	fd3 = open("test_files/data", O_RDONLY);
-	//dprintf(2, "Fd's: %d, %d, %d\n", fd1, fd2, fd3);
+	fd1 = open("test_files/bonus-1", O_RDONLY);
+	fd2 = open("test_files/bonus-2", O_RDONLY);
+	fd3 = open("test_files/bonus-3", O_RDONLY);
 	get_next_line(fd1, &line);
 	print_result(line);
 	get_next_line(fd3, &line);
@@ -80,6 +80,9 @@ void bonus_test_two()
 	empty_gnl(fd1);
 	empty_gnl(fd2);
 	empty_gnl(fd3);
+	close(fd1);
+	close(fd2);
+	close(fd3);
 }
 
 void bonus_test_three()
@@ -90,11 +93,9 @@ void bonus_test_three()
 	char *line;
 	line = NULL;
 
-	fd1 = open("test_files/easy", O_RDONLY);
-	fd2 = open("test_files/standard", O_RDONLY);
-	fd3 = open("test_files/data", O_RDONLY);
-	// dprintf(2, "Fd's: %d, %d, %d\n", fd1, fd2, fd3);
-	get_next_line(fd1, &line);
+	fd1 = open("test_files/bonus-1", O_RDONLY);
+	fd2 = open("test_files/bonus-2", O_RDONLY);
+	fd3 = open("test_files/bonus-3", O_RDONLY);
 	get_next_line(fd1, &line);
 	print_result(line);
 	get_next_line(fd3, &line);
@@ -116,6 +117,9 @@ void bonus_test_three()
 	empty_gnl(fd1);
 	empty_gnl(fd2);
 	empty_gnl(fd3);
+	close(fd1);
+	close(fd2);
+	close(fd3);
 }
 
 void bonus_tests(int test_num)
