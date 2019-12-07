@@ -11,6 +11,22 @@ void print_result(char *line)
 		printf("\n");
 	else
 		printf("%s\n", line);
+	free(line);
+}
+
+static void		empty_gnl(int fd)
+{
+	int		ret;
+	char	*line;
+
+	line = NULL;
+	ret = get_next_line(fd, &line);
+	while (ret != 0 && ret != -1)
+	{
+		free(line);
+		line = NULL;
+		ret = get_next_line(fd, &line);
+	}
 }
 
 void bonus_test_one()
@@ -22,7 +38,7 @@ void bonus_test_one()
 
 	fd1 = open("test_files/easy", O_RDONLY);
 	fd2 = open("test_files/stuff", O_RDONLY);
-
+	// dprintf(2, "Fd's: %d, %d\n", fd1, fd2);
 	get_next_line(fd1, &line);
 	print_result(line);
 	get_next_line(fd1, &line);
@@ -31,8 +47,8 @@ void bonus_test_one()
 	print_result(line);
 	get_next_line(fd1, &line);
 	print_result(line);
-	close(fd1);
-	close(fd2);
+	empty_gnl(fd1);
+	empty_gnl(fd2);
 }
 
 void bonus_test_two()
@@ -46,7 +62,7 @@ void bonus_test_two()
 	fd1 = open("test_files/easy", O_RDONLY);
 	fd2 = open("test_files/stuff", O_RDONLY);
 	fd3 = open("test_files/data", O_RDONLY);
-
+	//dprintf(2, "Fd's: %d, %d, %d\n", fd1, fd2, fd3);
 	get_next_line(fd1, &line);
 	print_result(line);
 	get_next_line(fd3, &line);
@@ -61,9 +77,9 @@ void bonus_test_two()
 	print_result(line);
 	get_next_line(fd2, &line);
 	print_result(line);
-	close(fd1);
-	close(fd2);
-	close(fd3);
+	empty_gnl(fd1);
+	empty_gnl(fd2);
+	empty_gnl(fd3);
 }
 
 void bonus_test_three()
@@ -77,7 +93,8 @@ void bonus_test_three()
 	fd1 = open("test_files/easy", O_RDONLY);
 	fd2 = open("test_files/standard", O_RDONLY);
 	fd3 = open("test_files/data", O_RDONLY);
-
+	// dprintf(2, "Fd's: %d, %d, %d\n", fd1, fd2, fd3);
+	get_next_line(fd1, &line);
 	get_next_line(fd1, &line);
 	print_result(line);
 	get_next_line(fd3, &line);
@@ -96,9 +113,9 @@ void bonus_test_three()
 	print_result(line);
 	get_next_line(fd2, &line);
 	print_result(line);
-	close(fd1);
-	close(fd2);
-	close(fd3);
+	empty_gnl(fd1);
+	empty_gnl(fd2);
+	empty_gnl(fd3);
 }
 
 void bonus_tests(int test_num)
