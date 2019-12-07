@@ -165,14 +165,37 @@ void null_test()
 		printf("Failed with null line parameter");
 }
 
+void neg_buf_size_test()
+{
+	char *line;
+
+	line = NULL;
+	int fd = open("test_files/standard", O_RDONLY);
+	if (get_next_line(fd, &line) != -1)
+		printf("Failed with negative buf size");
+}
+
+void invalid_fd_test()
+{
+	char *line;
+
+	line = NULL;
+	if (get_next_line(-1, &line) != -1)
+		printf("Failed with invalid fd");
+}
+
 int main(int amt, char **args)
 {
 	int fd;
 
 	if (amt == 3 && (ft_strncmp("bonus", args[1], 100000) == 0))
 		bonus_tests(ft_atoi(args[2]));
-	if (amt == 2 && (ft_strncmp("null", args[1], 100000) == 0))
+	else if (amt == 2 && (ft_strncmp("null", args[1], 100000) == 0))
 		null_test();
+	else if (amt == 2 && (ft_strncmp("fd", args[1], 100000) == 0))
+		invalid_fd_test();
+	else if (amt == 2 && (ft_strncmp("neg", args[1], 100000) == 0))
+		neg_buf_size_test();
 	else if (amt == 2 && (ft_strncmp("bonus", args[1], 100000) != 0))
 	{
 		fd = open(args[1], O_RDONLY);

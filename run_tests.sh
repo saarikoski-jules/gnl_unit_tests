@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PATH_GNL=".."
+PATH_GNL="../jsaariko2"
 
 rm results/result_log.txt
 rm results/result_log_bonus.txt
@@ -31,7 +31,6 @@ if [[ "$*" == "bonus" ]]; then
 			echo >> results/result_log_bonus.txt
 		fi
 		rm gnl_output.txt
-		# rm difference.txt
 	}
 
 	for i in ${buf_sizes_bonus[@]}; do
@@ -58,7 +57,7 @@ else
 			echo >> results/result_log.txt
 			echo "Failed test $1 with buf size $2" >> results/result_log.txt
 			echo >> results/result_log.txt
-			diff -U 3 gnl_output.txt bonus_results/test$1 >> results/result_log.txt
+			diff -U 3 $1 gnl_output.txt >> results/result_log.txt
 			echo >> results/result_log.txt
 		fi
 		rm gnl_output.txt
@@ -100,6 +99,7 @@ else
 		compare_output test_files/these-are-four-words $i
 		compare_output test_files/two-blank $i
 		compare_output test_files/wazzup $i
+		compare_output test_files/null-terminate $i
 		echo
 	done
 
@@ -123,8 +123,9 @@ else
 		echo "SUCCESS with NULL line param"
 	elif [[ -n "$temp" ]]; then
 		echo "\033[0;31mFAILED with NULL line param\033[0m"
-		diff $1 gnl_output.txt >> results/result_log.txt
+		diff test_files/empty gnl_output.txt >> results/result_log.txt
 	fi
+	rm gnl_output.txt
 
 	echo
 	echo "Testing with stdin ..."
@@ -155,6 +156,36 @@ else
 	fi
 	rm gnl_output.txt
 
+
+	gcc -o tester -Wall -Wextra -Werror -D BUFFER_SIZE=-1 ${PATH_GNL}/get_next_line.c ${PATH_GNL}/get_next_line_utils.c tests.c -L. -lft
+
+	echo
+	echo "Testing with buf size -1 ..."
+	echo
+	./tester neg > gnl_output.txt
+	temp=$(diff test_files/empty gnl_output.txt)
+	if [[ -z "$temp" ]]; then
+		echo "SUCCESS with buf size -1"
+	elif [[ -n "$temp" ]]; then
+		echo "\033[0;31mFAILED with buf size -1\033[0m"
+		diff test_files/empty gnl_output.txt >> results/result_log.txt
+	fi
+	rm gnl_output.txt
+
+	gcc -o tester -Wall -Wextra -Werror -D BUFFER_SIZE=1 ${PATH_GNL}/get_next_line.c ${PATH_GNL}/get_next_line_utils.c tests.c -L. -lft
+
+	echo
+	echo "Testing with bad fd ..."
+	echo
+	./tester fd > gnl_output.txt
+	temp=$(diff test_files/empty gnl_output.txt)
+	if [[ -z "$temp" ]]; then
+		echo "SUCCESS with bad fd"
+	elif [[ -n "$temp" ]]; then
+		echo "\033[0;31mFAILED with bad fd\033[0m"
+		diff test_files/empty gnl_output.txt >> results/result_log.txt
+	fi
+	rm gnl_output.txt
 
 	echo
 	echo "Testing finished"
