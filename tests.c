@@ -203,8 +203,8 @@ void invalid_fd_test()
 
 /*
 ** So the point is testing the first 100 allocations for protection in this way:
-** - Loop over the allocations that are going to fail and run gnl on a full file
-** - fake_malloc will make only that alloc fail
+** - Loop over the numbers of the allocations that are going to fail and run gnl on a full file for each of them
+** - fake_malloc will make only one malloc fail
 ** - If it crashes you failed the test. gnl should return -1 when it hits the alloc that fails, but right now that isn't tested.
 */
 
