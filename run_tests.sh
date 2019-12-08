@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PATH_GNL="../jsaariko2"
+PATH_GNL="../"
 
 rm results/result_log.txt
 rm results/result_log_bonus.txt
@@ -11,6 +11,9 @@ buf_sizes=(1 7 8 9 16 200 100000 2162)
 buf_sizes_bonus=(1 7 13 14 15 2162)
 
 cp ${PATH_GNL}/get_next_line.h .
+
+# This adds the prototype for fake_malloc to the header file
+echo "void *fake_malloc(size_t i);" >> get_next_line.h
 
 if [[ "$*" == "bonus" ]]; then
 	echo
@@ -186,6 +189,18 @@ else
 		diff test_files/empty gnl_output.txt >> results/result_log.txt
 	fi
 	rm gnl_output.txt
+
+	cp ../get_next_line.c fake_get_next_line.c
+	cp ../get_next_line_utils.c fake_get_next_line_utils.c
+	perl -pi -e 's/([\s\(\)])malloc\(/\1fake_malloc\(/g' fake_get_next_line.c fake_get_next_line_utils.c
+	gcc -o tester -D BUFFER_SIZE=-12 fake_get_next_line.c fake_get_next_line_utils.c tests.c -L. -lft
+	rm fake_get_next_line.c
+	rm fake_get_next_line_utils.c
+
+	echo
+	echo "Testing malloc protection ..."
+	echo
+	./tester alloc
 
 	echo
 	echo "Testing finished"

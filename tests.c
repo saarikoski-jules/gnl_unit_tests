@@ -2,8 +2,23 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <string.h>
 #include "libft.h"
 #include "get_next_line.h"
+
+static int g_tofail = -1;
+static int g_count = 0;
+
+void *fake_malloc(size_t i)
+{
+	void		*ptr;
+
+    g_count++;
+	ptr = NULL;
+	if (g_count != g_tofail)
+		ptr = malloc(i);
+    return ptr;
+}
 
 void print_result(char *line)
 {
@@ -27,6 +42,8 @@ static void		empty_gnl(int fd)
 		line = NULL;
 		ret = get_next_line(fd, &line);
 	}
+	if (ret != -1)
+		free(line);
 }
 
 void bonus_test_one()
@@ -184,6 +201,33 @@ void invalid_fd_test()
 		printf("Failed with invalid fd");
 }
 
+/*
+** So the point is testing the first 100 allocations for protection in this way:
+** - Loop over the allocations that are going to fail and run gnl on a full file
+** - fake_malloc will make only that alloc fail
+** - If it crashes you failed the test. gnl should return -1 when it hits the alloc that fails, but right now that isn't tested.
+*/
+
+void alloc_tests()
+{
+	int fd1;
+	char *line;
+	line = NULL;
+	int i;
+
+	i = 1;
+	while (i <= 100)
+	{
+		g_count = 0;
+		g_tofail = i;
+		fd1 = open("test_files/16-five", O_RDONLY);
+		empty_gnl(fd1);
+		close(fd1);
+		i++;
+	}
+	printf("SUCCESS with malloc protection.\n");
+}
+
 int main(int amt, char **args)
 {
 	int fd;
@@ -196,6 +240,8 @@ int main(int amt, char **args)
 		invalid_fd_test();
 	else if (amt == 2 && (ft_strncmp("neg", args[1], 100000) == 0))
 		neg_buf_size_test();
+	else if (amt == 2 && (strcmp("alloc", args[1]) == 0))
+		alloc_tests();
 	else if (amt == 2 && (ft_strncmp("bonus", args[1], 100000) != 0))
 	{
 		fd = open(args[1], O_RDONLY);
