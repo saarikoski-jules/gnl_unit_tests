@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PATH_GNL="../"
+PATH_GNL="../jsaariko2"
 
 rm results/result_log.txt
 rm results/result_log_bonus.txt
