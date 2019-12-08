@@ -37,7 +37,7 @@ if [[ "$*" == "bonus" ]]; then
 	}
 
 	for i in ${buf_sizes_bonus[@]}; do
-		gcc -o tester -Wall -Wextra -Werror -D BUFFER_SIZE=$i ${PATH_GNL}/get_next_line.c ${PATH_GNL}/get_next_line_utils.c tests.c -L. -lft
+		gcc -o tester -Wall -Wextra -Werror -D BUFFER_SIZE=$i ${PATH_GNL}/get_next_line.c ${PATH_GNL}/get_next_line_utils.c tests.c
 		echo "Bonus with buf size $i"
 		compare_bonus 1 $i
 		compare_bonus 2 $i
@@ -69,7 +69,7 @@ else
 	echo "Testing basic input ..."
 	echo
 	for i in ${buf_sizes[@]}; do
-		gcc -o tester -Wall -Wextra -Werror -D BUFFER_SIZE=$i ${PATH_GNL}/get_next_line.c ${PATH_GNL}/get_next_line_utils.c tests.c -L. -lft
+		gcc -o tester -Wall -Wextra -Werror -D BUFFER_SIZE=$i ${PATH_GNL}/get_next_line.c ${PATH_GNL}/get_next_line_utils.c tests.c
 		echo "Tests with buf size $i"
 		echo
 		compare_output test_files/4-five $i
@@ -115,7 +115,7 @@ else
 	compare_output test_files/long-clear $i
 	compare_output test_files/doomed-to-fail $i
 
-	gcc -o tester -Wall -Wextra -Werror -D BUFFER_SIZE=12 ${PATH_GNL}/get_next_line.c ${PATH_GNL}/get_next_line_utils.c tests.c -L. -lft
+	gcc -o tester -Wall -Wextra -Werror -D BUFFER_SIZE=12 ${PATH_GNL}/get_next_line.c ${PATH_GNL}/get_next_line_utils.c tests.c
 
 	echo
 	echo "Testing with bad line param ..."
@@ -144,7 +144,7 @@ else
 	fi
 	rm gnl_output.txt
 
-	gcc -o tester -Wall -Wextra -Werror -D BUFFER_SIZE=0 ${PATH_GNL}/get_next_line.c ${PATH_GNL}/get_next_line_utils.c tests.c -L. -lft
+	gcc -o tester -Wall -Wextra -Werror -D BUFFER_SIZE=0 ${PATH_GNL}/get_next_line.c ${PATH_GNL}/get_next_line_utils.c tests.c
 
 	echo
 	echo "Testing with buf size 0 ..."
@@ -160,7 +160,7 @@ else
 	rm gnl_output.txt
 
 
-	gcc -o tester -Wall -Wextra -Werror -D BUFFER_SIZE=-1 ${PATH_GNL}/get_next_line.c ${PATH_GNL}/get_next_line_utils.c tests.c -L. -lft
+	gcc -o tester -Wall -Wextra -Werror -D BUFFER_SIZE=-1 ${PATH_GNL}/get_next_line.c ${PATH_GNL}/get_next_line_utils.c tests.c
 
 	echo
 	echo "Testing with buf size -1 ..."
@@ -175,7 +175,7 @@ else
 	fi
 	rm gnl_output.txt
 
-	gcc -o tester -Wall -Wextra -Werror -D BUFFER_SIZE=1 ${PATH_GNL}/get_next_line.c ${PATH_GNL}/get_next_line_utils.c tests.c -L. -lft
+	gcc -o tester -Wall -Wextra -Werror -D BUFFER_SIZE=1 ${PATH_GNL}/get_next_line.c ${PATH_GNL}/get_next_line_utils.c tests.c
 
 	echo
 	echo "Testing with bad fd ..."

@@ -3,7 +3,6 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <string.h>
-#include "libft.h"
 #include "get_next_line.h"
 
 static int g_tofail = -1;
@@ -232,17 +231,17 @@ int main(int amt, char **args)
 {
 	int fd;
 
-	if (amt == 3 && (ft_strncmp("bonus", args[1], 100000) == 0))
-		bonus_tests(ft_atoi(args[2]));
-	else if (amt == 2 && (ft_strncmp("null", args[1], 100000) == 0))
+	if (amt == 3 && (strcmp("bonus", args[1]) == 0))
+		bonus_tests(atoi(args[2]));
+	else if (amt == 2 && (strcmp("null", args[1]) == 0))
 		null_test();
-	else if (amt == 2 && (ft_strncmp("fd", args[1], 100000) == 0))
+	else if (amt == 2 && (strcmp("fd", args[1]) == 0))
 		invalid_fd_test();
-	else if (amt == 2 && (ft_strncmp("neg", args[1], 100000) == 0))
+	else if (amt == 2 && (strcmp("neg", args[1]) == 0))
 		neg_buf_size_test();
 	else if (amt == 2 && (strcmp("alloc", args[1]) == 0))
 		alloc_tests();
-	else if (amt == 2 && (ft_strncmp("bonus", args[1], 100000) != 0))
+	else if (amt == 2)
 	{
 		fd = open(args[1], O_RDONLY);
 		basic_tests(fd);
