@@ -191,7 +191,7 @@ else
 	rm gnl_output.txt
 
 	cp ../get_next_line.c fake_get_next_line.c
-	cp ../get_next_line_utils.c fake_get_next_line_utils.c
+	cp ${PATH_GNL}/get_next_line_utils.c fake_get_next_line_utils.c
 	perl -pi -e 's/([\s\(\)])malloc\(/\1fake_malloc\(/g' fake_get_next_line.c fake_get_next_line_utils.c
 	gcc -o tester -D BUFFER_SIZE=-12 fake_get_next_line.c fake_get_next_line_utils.c tests.c -L. -lft
 	rm fake_get_next_line.c
