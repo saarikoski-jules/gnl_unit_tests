@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PATH_GNL="../jsaariko2"
+PATH_GNL="../gnl_github"
 
 rm results/result_log.txt
 rm results/result_log_bonus.txt
@@ -12,8 +12,9 @@ buf_sizes_bonus=(1 7 13 14 15 2162)
 
 cp ${PATH_GNL}/get_next_line.h .
 
-# This adds the prototype for fake_malloc to the header file
 echo "void *fake_malloc(size_t i);" >> get_next_line.h
+echo "void *count_malloc(size_t size);" >> get_next_line.h
+echo "void count_free(void *ptr);" >> get_next_line.h
 
 if [[ "$*" == "bonus" ]]; then
 	echo
@@ -42,6 +43,7 @@ if [[ "$*" == "bonus" ]]; then
 		compare_bonus 1 $i
 		compare_bonus 2 $i
 		compare_bonus 3 $i
+		compare_bonus 4 $i
 		echo
 	done
 
@@ -126,7 +128,7 @@ else
 		echo "SUCCESS with NULL line param"
 	elif [[ -n "$temp" ]]; then
 		echo "\033[0;31mFAILED with NULL line param\033[0m"
-		diff test_files/empty gnl_output.txt >> results/result_log.txt
+		diff -U 3 test_files/empty gnl_output.txt >> results/result_log.txt
 	fi
 	rm gnl_output.txt
 
@@ -140,7 +142,7 @@ else
 		echo "SUCCESS with stdin"
 	elif [[ -n "$temp" ]]; then
 		echo "\033[0;31mFAILED with stdin\033[0m"
-		diff test_files/easy gnl_output.txt >> results/result_log.txt
+		diff -U 3 test_files/easy gnl_output.txt >> results/result_log.txt
 	fi
 	rm gnl_output.txt
 
@@ -155,7 +157,7 @@ else
 		echo "SUCCESS with buf size 0"
 	elif [[ -n "$temp" ]]; then
 		echo "\033[0;31mFAILED with buf size 0\033[0m"
-		diff $1 gnl_output.txt >> results/result_log.txt
+		diff -U 3 $1 gnl_output.txt >> results/result_log.txt
 	fi
 	rm gnl_output.txt
 
@@ -171,7 +173,7 @@ else
 		echo "SUCCESS with buf size -1"
 	elif [[ -n "$temp" ]]; then
 		echo "\033[0;31mFAILED with buf size -1\033[0m"
-		diff test_files/empty gnl_output.txt >> results/result_log.txt
+		diff -U 3 test_files/empty gnl_output.txt >> results/result_log.txt
 	fi
 	rm gnl_output.txt
 
@@ -185,8 +187,8 @@ else
 	if [[ -z "$temp" ]]; then
 		echo "SUCCESS with bad fd"
 	elif [[ -n "$temp" ]]; then
-		echo "\033[0;31mFAILED with bad fd\033[0m"
-		diff test_files/empty gnl_output.txt >> results/result_log.txt
+		echo "\033[0;31mFAILED with bad fd -1\033[0m"
+		diff -U 3 test_files/empty gnl_output.txt >> results/result_log.txt
 	fi
 	rm gnl_output.txt
 
@@ -200,7 +202,58 @@ else
 	echo
 	echo "Testing malloc protection ..."
 	echo
-	./tester alloc
+
+	./tester alloc > gnl_output.txt
+	ERR=$?;
+	if [ $ERR -ne 0 ]; then 
+		echo "\033[0;31mFAILED segfaults on malloc protection tests\033[0m"
+		echo "FAILED segfaults on malloc protection tests" >> results/result_log.txt
+	
+	temp=$(diff test_files/empty gnl_output.txt)
+	elif [[ -z "$temp" ]]; then
+		echo "SUCCESS with malloc protection"
+	elif [[ -n "$temp" ]]; then
+		echo "\033[0;31mFAILED Bad return value when malloc fails\033[0m"
+		diff -U 3 test_files/empty gnl_output.txt >> results/result_log.txt
+	fi
+
+	echo
+	echo "Testing for memory leaks ..."
+	echo
+
+	cp ${PATH_GNL}/get_next_line.c fake_get_next_line.c
+	cp ${PATH_GNL}/get_next_line_utils.c fake_get_next_line_utils.c
+	perl -pi -e 's/([\s\(\)])malloc\(/\1count_malloc\(/g' fake_get_next_line.c fake_get_next_line_utils.c
+	perl -pi -e 's/([\s\(\)])free\(/\1count_free\(/g' fake_get_next_line.c fake_get_next_line_utils.c
+	
+
+	leak_check() {
+		./tester leaks $1 $2>> gnl_output.txt
+	}
+
+	for i in ${buf_sizes[@]}; do
+		gcc -o tester -D BUFFER_SIZE=$i fake_get_next_line.c fake_get_next_line_utils.c tests.c
+		leak_check test_files/4-five $i
+		leak_check test_files/4-one-n $i
+		leak_check test_files/8-one $i
+		leak_check test_files/16-five $i
+		leak_check test_files/alpha-3ln $i
+		leak_check test_files/empty $i
+		leak_check test_files/lorem2 $i
+		leak_check test_files/nl-disaster $i
+		leak_check test_files/these-are-four-words $i
+	done
+	rm fake_get_next_line.c
+	rm fake_get_next_line_utils.c
+
+	temp=$(diff gnl_output.txt test_files/empty)
+	if [[ -z "$temp" ]]; then
+		echo "SUCCESS: No leaks found"
+	elif [[ -n "$temp" ]]; then
+		echo "\033[0;31mFAILED: Leaks found\033[0m"
+		diff -U 3 test_files/empty gnl_output.txt >> results/result_log.txt
+	fi
+	rm gnl_output.txt
 
 	echo
 	echo "Testing finished"

@@ -7,6 +7,23 @@
 
 static int g_tofail = -1;
 static int g_count = 0;
+static int g_alloc_amt = 0;
+static int g_free_amt = 0;
+
+void *count_malloc(size_t size)
+{
+	g_alloc_amt++;
+	return(malloc(size));
+}
+
+void count_free(void *ptr)
+{
+	if (ptr != NULL)
+	{
+		g_free_amt++;
+		free(ptr);
+	}
+}
 
 void *fake_malloc(size_t i)
 {
@@ -28,7 +45,7 @@ void print_result(char *line)
 	free(line);
 }
 
-static void		empty_gnl(int fd)
+static int		empty_gnl(int fd)
 {
 	int		ret;
 	char	*line;
@@ -43,6 +60,7 @@ static void		empty_gnl(int fd)
 	}
 	if (ret != -1)
 		free(line);
+	return (ret);
 }
 
 void bonus_test_one()
@@ -138,6 +156,52 @@ void bonus_test_three()
 	close(fd3);
 }
 
+void bonus_test_four()
+{
+	int fd1;
+	int fd2;
+	int fd3;
+	int fd4;
+	char *line;
+	line = NULL;
+
+	fd1 = open("test_files/bonus-1", O_RDONLY);
+	fd2 = open("test_files/bonus-2", O_RDONLY);
+	fd3 = open("test_files/bonus-3", O_RDONLY);
+	fd4 = open("test_files/standard", O_RDONLY);
+	get_next_line(fd1, &line);
+	print_result(line);
+	get_next_line(fd3, &line);
+	print_result(line);
+	get_next_line(fd2, &line);
+	print_result(line);
+	get_next_line(fd4, &line);
+	print_result(line);
+	get_next_line(fd4, &line);
+	print_result(line);
+	get_next_line(fd4, &line);
+	print_result(line);
+	get_next_line(fd1, &line);
+	print_result(line);
+	get_next_line(fd3, &line);
+	print_result(line);
+	get_next_line(fd2, &line);
+	print_result(line);
+	get_next_line(fd2, &line);
+	print_result(line);
+	get_next_line(fd1, &line);
+	print_result(line);
+	get_next_line(fd2, &line);
+	print_result(line);
+	empty_gnl(fd1);
+	empty_gnl(fd2);
+	empty_gnl(fd3);
+	close(fd1);
+	close(fd2);
+	close(fd3);
+	close(fd4);
+}
+
 void bonus_tests(int test_num)
 {
 	char *line;
@@ -149,6 +213,8 @@ void bonus_tests(int test_num)
 		bonus_test_two();
 	if (test_num == 3)
 		bonus_test_three();
+	if (test_num == 4)
+		bonus_test_four();
 }
 
 void basic_tests(int fd)
@@ -164,6 +230,7 @@ void basic_tests(int fd)
 			printf("%s", line);
 		if (ret > 0)
 			printf("\n");
+		free(line);
 	}
 	if (ret != 0 && ret != 1)
 		printf("return value %d\n", ret);
@@ -200,31 +267,47 @@ void invalid_fd_test()
 		printf("Failed with invalid fd");
 }
 
-/*
-** So the point is testing the first 100 allocations for protection in this way:
-** - Loop over the numbers of the allocations that are going to fail and run gnl on a full file for each of them
-** - fake_malloc will make only one malloc fail
-** - If it crashes you failed the test. gnl should return -1 when it hits the alloc that fails, but right now that isn't tested.
-*/
-
 void alloc_tests()
 {
 	int fd1;
 	char *line;
 	line = NULL;
 	int i;
+	int ret;
 
+	ret = 0;
 	i = 1;
 	while (i <= 100)
 	{
 		g_count = 0;
 		g_tofail = i;
-		fd1 = open("test_files/16-five", O_RDONLY);
-		empty_gnl(fd1);
+		fd1 = open("test_files/16-one", O_RDONLY);
+		if (empty_gnl(fd1) == -1)
+			ret = -1;
 		close(fd1);
 		i++;
 	}
-	printf("SUCCESS with malloc protection.\n");
+	if (ret != -1)
+		printf("Bad return value when malloc fails\n");
+}
+
+void leak_test(char *arg, int buf_size)
+{
+	int fd;
+	int ret;
+	char *line;
+
+	ret = 1;
+	line = NULL;
+	fd = open(arg, O_RDONLY);
+	while (ret == 1)
+	{
+		ret = get_next_line(fd, &line);
+		count_free(line);
+	}
+	close(fd);
+	if (g_alloc_amt != g_free_amt)
+		printf("Leaks found with buf size %d testing file %s\n", buf_size, arg);
 }
 
 int main(int amt, char **args)
@@ -241,6 +324,8 @@ int main(int amt, char **args)
 		neg_buf_size_test();
 	else if (amt == 2 && (strcmp("alloc", args[1]) == 0))
 		alloc_tests();
+	else if (amt == 4 && (strcmp("leaks", args[1]) == 0))
+		leak_test(args[2], atoi(args[3]));
 	else if (amt == 2)
 	{
 		fd = open(args[1], O_RDONLY);
