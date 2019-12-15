@@ -193,31 +193,6 @@ else
 	fi
 	rm gnl_output.txt
 
-	cp ${PATH_GNL}/get_next_line.c fake_get_next_line.c
-	cp ${PATH_GNL}/get_next_line_utils.c fake_get_next_line_utils.c
-	perl -pi -e 's/([\s\(\)])malloc\(/\1fake_malloc\(/g' fake_get_next_line.c fake_get_next_line_utils.c
-	gcc -o tester -D BUFFER_SIZE=12 fake_get_next_line.c fake_get_next_line_utils.c $includes
-	rm fake_get_next_line.c
-	rm fake_get_next_line_utils.c
-
-	echo
-	echo "Testing malloc protection ..."
-	echo
-
-	./tester alloc > gnl_output.txt
-	ERR=$?;
-	if [ $ERR -ne 0 ]; then 
-		echo "\033[0;31mFAILED segfaults on malloc protection tests\033[0m"
-		echo "FAILED segfaults on malloc protection tests" >> results/result_log.txt
-	
-	temp=$(diff $dir/empty gnl_output.txt)
-	elif [[ -z "$temp" ]]; then
-		echo "SUCCESS with malloc protection"
-	elif [[ -n "$temp" ]]; then
-		echo "\033[0;31mFAILED Bad return value when malloc fails\033[0m"
-		diff -U 3 $dir/empty gnl_output.txt >> results/result_log.txt
-	fi
-	rm gnl_output.txt
 	echo
 	echo "Testing finished"
 	echo "To test bonus, run sh run_tests.sh bonus"
