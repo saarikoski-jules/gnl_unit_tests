@@ -89,6 +89,6 @@ void leak_test(char *arg, int buf_size)
 		count_free(line);
 	}
 	close(fd);
-	if (g_alloc_amt != g_free_amt)
+	if (g_alloc_amt > g_free_amt)
 		printf("Leaks found with buf size %d testing file %s\n", buf_size, arg);
 }

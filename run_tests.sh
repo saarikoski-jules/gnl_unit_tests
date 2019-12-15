@@ -247,7 +247,7 @@ else
 	rm fake_get_next_line.c
 	rm fake_get_next_line_utils.c
 
-	temp=$(diff gnl_output.txt $dir/empty)
+	temp=$(diff $dir/empty gnl_output.txt)
 	if [[ -z "$temp" ]]; then
 		echo "SUCCESS: No leaks found"
 	elif [[ -n "$temp" ]]; then
