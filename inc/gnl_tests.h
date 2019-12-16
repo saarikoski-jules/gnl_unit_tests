@@ -1,11 +1,15 @@
 #ifndef GNL_TESTS_H
-#define GNL_TESTS_H
-#include <stdio.h>
-#include <stdlib.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <string.h>
-#include "../get_next_line.h"
+# define GNL_TESTS_H
+# include <stdio.h>
+# include <stdlib.h>
+# include <fcntl.h>
+# include <unistd.h>
+# include <string.h>
+# ifndef BONUS
+#  include "../get_next_line.h"
+# else
+#  include "../get_next_line_bonus.h"
+# endif
 
 extern int g_tofail;
 extern int g_count;

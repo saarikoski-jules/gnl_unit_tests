@@ -12,16 +12,12 @@ touch results/result_log_bonus.txt
 buf_sizes=(1 7 8 9 16 200 100000 2162)
 buf_sizes_bonus=(1 7 13 14 15 2162)
 
-cp ${PATH_GNL}/get_next_line.h .
-
-echo "void *fake_malloc(size_t i);" >> get_next_line.h
-echo "void *count_malloc(size_t size);" >> get_next_line.h
-echo "void count_free(void *ptr);" >> get_next_line.h
-
 if [[ "$*" == "bonus" ]]; then
 	echo
 	echo "Testing bonus"
 	echo
+
+	cp ${PATH_GNL}/get_next_line_bonus.h .
 
 	compare_bonus() {
 		./tester bonus $1 > gnl_output.txt
@@ -40,7 +36,7 @@ if [[ "$*" == "bonus" ]]; then
 	}
 
 	for i in ${buf_sizes_bonus[@]}; do
-		gcc -o tester -Wall -Wextra -Werror -D BUFFER_SIZE=$i ${PATH_GNL}/get_next_line.c ${PATH_GNL}/get_next_line_utils.c $includes
+		gcc -o tester -Wall -Wextra -Werror -D BUFFER_SIZE=$i -D BONUS ${PATH_GNL}/get_next_line_bonus.c ${PATH_GNL}/get_next_line_utils_bonus.c $includes
 		echo "Bonus with buf size $i"
 		compare_bonus 1 $i
 		compare_bonus 2 $i
@@ -53,7 +49,16 @@ if [[ "$*" == "bonus" ]]; then
 	echo "To test basic input: sh run_tests.sh"
 	echo "To see differences in output, see result_log_bonus.txt in results/"
 
+	rm get_next_line_bonus.h
+
 else
+
+	cp ${PATH_GNL}/get_next_line.h .
+
+	echo "void *fake_malloc(size_t i);" >> get_next_line.h
+	echo "void *count_malloc(size_t size);" >> get_next_line.h
+	echo "void count_free(void *ptr);" >> get_next_line.h
+
 	compare_output() {
 		./tester $1 > gnl_output.txt
 		local temp=$(diff $1 gnl_output.txt)
@@ -262,7 +267,9 @@ else
 	echo "Testing finished"
 	echo "To test bonus, run sh run_tests.sh bonus"
 	echo "To see the differences in output, see result_log.txt in results/"
+
+	rm get_next_line.h
+
 fi
 
-rm get_next_line.h
 rm tester
