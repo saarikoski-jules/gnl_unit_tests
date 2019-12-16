@@ -1,5 +1,9 @@
 #include "gnl_tests.h"
 
+int g_alloc_amt = 0;
+int g_free_amt = 0;
+int g_tofail = -1;
+int g_count = 0;
 
 void basic_tests(int fd)
 {
@@ -65,7 +69,7 @@ void alloc_tests()
 	{
 		g_count = 0;
 		g_tofail = i;
-		fd1 = open("test_files/16-one", O_RDONLY);
+		fd1 = open("inc/test_files/4-five", O_RDONLY);
 		if (empty_gnl(fd1) == -1)
 			ret = -1;
 		close(fd1);

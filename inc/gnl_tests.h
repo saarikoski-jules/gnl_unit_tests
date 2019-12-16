@@ -7,10 +7,10 @@
 #include <string.h>
 #include "../get_next_line.h"
 
-static int g_tofail = -1;
-static int g_count = 0;
-static int g_alloc_amt = 0;
-static int g_free_amt = 0;
+extern int g_tofail;
+extern int g_count;
+extern int g_alloc_amt;
+extern int g_free_amt;
 
 void basic_tests(int fd);
 void null_test();

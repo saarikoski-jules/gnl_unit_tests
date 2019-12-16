@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PATH_GNL="../gnl_github"
+PATH_GNL="../get_next_line"
 dir="inc/test_files"
 includes="inc/tests.c inc/bonus_tests.c inc/utils.c inc/basic_tests.c"
 
@@ -189,6 +189,71 @@ else
 		echo "SUCCESS with bad fd"
 	elif [[ -n "$temp" ]]; then
 		echo "\033[0;31mFAILED with bad fd -1\033[0m"
+		diff -U 3 $dir/empty gnl_output.txt >> results/result_log.txt
+	fi
+	rm gnl_output.txt
+
+	echo
+	echo "Testing malloc protection ..."
+	echo
+
+	cp ${PATH_GNL}/get_next_line.c fake_get_next_line.c
+	cp ${PATH_GNL}/get_next_line_utils.c fake_get_next_line_utils.c
+	perl -pi -e 's/([\s\(\)])malloc\(/\1fake_malloc\(/g' fake_get_next_line.c fake_get_next_line_utils.c
+	gcc -o tester -D BUFFER_SIZE=1 fake_get_next_line.c fake_get_next_line_utils.c $includes
+	rm fake_get_next_line.c
+	rm fake_get_next_line_utils.c
+
+	./tester alloc > gnl_output.txt
+	ERR=$?;
+	if [ $ERR -ne 0 ]; then 
+		echo "\033[0;31mFAILED segfaults on malloc protection tests\033[0m"
+		echo "FAILED segfaults on malloc protection tests" >> results/result_log.txt
+	
+	temp=$(diff $dir/empty gnl_output.txt)
+	elif [[ -z "$temp" ]]; then
+		echo "SUCCESS with malloc protection"
+	elif [[ -n "$temp" ]]; then
+		echo "\033[0;31mFAILED Bad return value when malloc fails\033[0m"
+		diff -U 3 $dir/empty gnl_output.txt >> results/result_log.txt
+	fi
+	rm gnl_output.txt
+
+	echo
+	echo "Testing for memory leaks ..."
+	echo
+
+	cp ${PATH_GNL}/get_next_line.c fake_get_next_line.c
+	cp ${PATH_GNL}/get_next_line_utils.c fake_get_next_line_utils.c
+	perl -pi -e 's/([\s\(\)])malloc\(/\1count_malloc\(/g' fake_get_next_line.c fake_get_next_line_utils.c
+	perl -pi -e 's/([\s\(\)])free\(/\1count_free\(/g' fake_get_next_line.c fake_get_next_line_utils.c
+	
+
+	leak_check() {
+		./tester leaks $1 $2>> gnl_output.txt
+	}
+
+	for i in ${buf_sizes[@]}; do
+		gcc -o tester -D BUFFER_SIZE=$i fake_get_next_line.c fake_get_next_line_utils.c $includes
+		leak_check $dir/4-five $i
+		leak_check $dir/4-one-n $i
+		leak_check $dir/8-one $i
+		leak_check $dir/16-five $i
+		leak_check $dir/alpha-3ln $i
+		leak_check $dir/empty $i
+		leak_check $dir/lorem2 $i
+		leak_check $dir/nl-disaster $i
+		leak_check $dir/these-are-four-words $i
+	done
+
+	rm fake_get_next_line.c
+	rm fake_get_next_line_utils.c
+
+	temp=$(diff $dir/empty gnl_output.txt)
+	if [[ -z "$temp" ]]; then
+		echo "SUCCESS: No leaks found"
+	elif [[ -n "$temp" ]]; then
+		echo "\033[0;31mFAILED: Leaks found\033[0m"
 		diff -U 3 $dir/empty gnl_output.txt >> results/result_log.txt
 	fi
 	rm gnl_output.txt
