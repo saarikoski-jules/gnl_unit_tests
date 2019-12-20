@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PATH_GNL="../get_next_line"
+PATH_GNL=".."
 dir="inc/test_files"
 includes="inc/tests.c inc/bonus_tests.c inc/utils.c inc/basic_tests.c"
 
@@ -214,13 +214,14 @@ else
 	if [ $ERR -ne 0 ]; then 
 		echo "\033[0;31mFAILED segfaults on malloc protection tests\033[0m"
 		echo "FAILED segfaults on malloc protection tests" >> results/result_log.txt
-	
-	temp=$(diff $dir/empty gnl_output.txt)
-	elif [[ -z "$temp" ]]; then
-		echo "SUCCESS with malloc protection"
-	elif [[ -n "$temp" ]]; then
-		echo "\033[0;31mFAILED Bad return value when malloc fails\033[0m"
-		diff -U 3 $dir/empty gnl_output.txt >> results/result_log.txt
+	else
+		temp=$(diff $dir/empty gnl_output.txt)
+		if [[ -z "$temp" ]]; then
+			echo "SUCCESS with malloc protection"
+		elif [[ -n "$temp" ]]; then
+			echo "\033[0;31mFAILED Bad return value when malloc fails\033[0m"
+			diff -U 3 $dir/empty gnl_output.txt >> results/result_log.txt
+		fi
 	fi
 	rm gnl_output.txt
 
