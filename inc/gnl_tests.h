@@ -6,9 +6,9 @@
 # include <unistd.h>
 # include <string.h>
 # ifndef BONUS
-#  include "../get_next_line.h"
+#  include "../get_next_line_cpy.h"
 # else
-#  include "../get_next_line_bonus.h"
+#  include "../get_next_line_bonus_cpy.h"
 # endif
 
 extern int g_tofail;

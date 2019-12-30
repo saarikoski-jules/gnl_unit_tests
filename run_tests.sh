@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PATH_GNL=".."
+PATH_GNL="../gnl_aAAAAAAHHHHH/gnl_final"
 dir="inc/test_files"
 includes="inc/tests.c inc/bonus_tests.c inc/utils.c inc/basic_tests.c"
 
@@ -17,7 +17,7 @@ if [[ "$*" == "bonus" ]]; then
 	echo "Testing bonus"
 	echo
 
-	cp ${PATH_GNL}/get_next_line_bonus.h .
+	cp ${PATH_GNL}/get_next_line_bonus.h get_next_line_bonus_cpy.h
 
 	compare_bonus() {
 		./tester bonus $1 > gnl_output.txt
@@ -49,15 +49,16 @@ if [[ "$*" == "bonus" ]]; then
 	echo "To test basic input: sh run_tests.sh"
 	echo "To see differences in output, see result_log_bonus.txt in results/"
 
-	rm get_next_line_bonus.h
+	rm get_next_line_bonus_cpy.h
 
 else
 
-	cp ${PATH_GNL}/get_next_line.h .
+	cp ${PATH_GNL}/get_next_line.h get_next_line_cpy.h
+	sed -i '' 's/GET_NEXT_LINE_H/GET_NEXT_LINE_CPY_H/g' get_next_line_cpy.h
 
-	echo "void *fake_malloc(size_t i);" >> get_next_line.h
-	echo "void *count_malloc(size_t size);" >> get_next_line.h
-	echo "void count_free(void *ptr);" >> get_next_line.h
+	echo "void *fake_malloc(size_t i);" >> get_next_line_cpy.h
+	echo "void *count_malloc(size_t size);" >> get_next_line_cpy.h
+	echo "void count_free(void *ptr);" >> get_next_line_cpy.h
 
 	compare_output() {
 		./tester $1 > gnl_output.txt
@@ -204,6 +205,10 @@ else
 
 	cp ${PATH_GNL}/get_next_line.c fake_get_next_line.c
 	cp ${PATH_GNL}/get_next_line_utils.c fake_get_next_line_utils.c
+
+	sed -i '' 's/get_next_line.h/get_next_line_cpy.h/g' fake_get_next_line.c fake_get_next_line_utils.c
+	sed -i '' 's/malloc/fake_malloc/g' fake_get_next_line.c fake_get_next_line_utils.c
+
 	perl -pi -e 's/([\s\(\)])malloc\(/\1fake_malloc\(/g' fake_get_next_line.c fake_get_next_line_utils.c
 	gcc -o tester -D BUFFER_SIZE=1 fake_get_next_line.c fake_get_next_line_utils.c $includes
 	rm fake_get_next_line.c
@@ -231,8 +236,10 @@ else
 
 	cp ${PATH_GNL}/get_next_line.c fake_get_next_line.c
 	cp ${PATH_GNL}/get_next_line_utils.c fake_get_next_line_utils.c
-	perl -pi -e 's/([\s\(\)])malloc\(/\1count_malloc\(/g' fake_get_next_line.c fake_get_next_line_utils.c
-	perl -pi -e 's/([\s\(\)])free\(/\1count_free\(/g' fake_get_next_line.c fake_get_next_line_utils.c
+
+	sed -i '' 's/malloc/count_malloc/g' fake_get_next_line.c fake_get_next_line_utils.c
+	sed -i '' 's/free/count_free/g' fake_get_next_line.c fake_get_next_line_utils.c
+	sed -i '' 's/get_next_line.h/get_next_line_cpy.h/g' fake_get_next_line.c fake_get_next_line_utils.c
 	
 
 	leak_check() {
@@ -269,7 +276,7 @@ else
 	echo "To test bonus, run sh run_tests.sh bonus"
 	echo "To see the differences in output, see result_log.txt in results/"
 
-	rm get_next_line.h
+	rm get_next_line_cpy.h
 
 fi
 
