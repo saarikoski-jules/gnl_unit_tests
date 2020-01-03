@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PATH_GNL="../crap_next_line"
+PATH_GNL=".."
 dir="inc/test_files"
 includes="inc/tests.c inc/bonus_tests.c inc/utils.c inc/basic_tests.c"
 
@@ -11,6 +11,74 @@ touch results/result_log_bonus.txt
 
 buf_sizes=(1 7 8 9 16 200 100000 2162)
 buf_sizes_bonus=(1 7 13 14 15 2162)
+
+GNL="${PATH_GNL}/get_next_line.c"
+GNL_UTILS="${PATH_GNL}/get_next_line_utils.c"
+
+F_GNL="fake_get_next_line.c"
+F_GNL_UTILS="fake_get_next_line_utils.c"
+
+
+basic_tests() {
+		compare_output() {
+			./tester $1 > gnl_output.txt
+			local temp=$(diff $1 gnl_output.txt)
+			if [[ -z "$temp" ]]; then
+				echo "SUCCESS $1"
+			elif [[ -n "$temp" ]]; then
+				echo "\033[0;31mFAILED: $1\033[0m"
+				echo >> results/result_log.txt
+				echo "Failed test $1 with buf size $2" >> results/result_log.txt
+				echo >> results/result_log.txt
+				diff -U 3 $1 gnl_output.txt >> results/result_log.txt
+				echo >> results/result_log.txt
+			fi
+			rm gnl_output.txt
+		}
+
+	echo $1
+	echo $2
+
+		echo "Testing basic input ..."
+		echo
+		for i in ${buf_sizes[@]}; do
+			gcc -o tester -Wall -Wextra -Werror -D BUFFER_SIZE=$i $1 $2 $includes
+			echo "Tests with buf size $i"
+			echo
+			compare_output $dir/4-five $i
+			compare_output $dir/4-one $i
+			compare_output $dir/4-one-n $i
+			compare_output $dir/4-three $i
+			compare_output $dir/4-two $i
+			compare_output $dir/8-five $i
+			compare_output $dir/8-one $i
+			compare_output $dir/8-one-n $i
+			compare_output $dir/8-three $i
+			compare_output $dir/8-two $i
+			compare_output $dir/16-five $i
+			compare_output $dir/16-one $i
+			compare_output $dir/16-one-n $i
+			compare_output $dir/16-three $i
+			compare_output $dir/16-two $i
+			compare_output $dir/alpha-3ln $i
+			compare_output $dir/easy $i
+			compare_output $dir/empty $i
+			compare_output $dir/empty-then-char $i
+			compare_output $dir/libft.txt $i
+			compare_output $dir/lorem1 $i
+			compare_output $dir/lorem2 $i
+			compare_output $dir/nl-disaster $i
+			compare_output $dir/one-blank-line $i
+			compare_output $dir/standard $i
+			compare_output $dir/stuff $i
+			compare_output $dir/these-are-four-words $i
+			compare_output $dir/two-blank $i
+			compare_output $dir/wazzup $i
+			compare_output $dir/null-terminate $i
+			echo
+		done
+	}
+
 
 if [[ "$*" == "bonus" ]]; then
 	echo
@@ -51,6 +119,27 @@ if [[ "$*" == "bonus" ]]; then
 
 	rm get_next_line_bonus_cpy.h
 
+elif [[ "$*" == "malloc" ]]; then
+
+	echo
+	echo "Running basic tests in destroy malloc mode ..."
+
+	cp ${PATH_GNL}/get_next_line.h get_next_line_cpy.h
+	cp ${PATH_GNL}/get_next_line.c fake_get_next_line.c
+	cp ${PATH_GNL}/get_next_line_utils.c fake_get_next_line_utils.c
+	echo "void *destroy_malloc(size_t i);" >> get_next_line_cpy.h
+
+
+	sed -i '' 's/get_next_line.h/get_next_line_cpy.h/g' fake_get_next_line.c fake_get_next_line_utils.c
+
+	perl -pi -e 's/([\s\(\)])malloc\(/\1destroy_malloc\(/g' fake_get_next_line.c fake_get_next_line_utils.c	
+
+	basic_tests $F_GNL $F_GNL_UTILS
+
+	rm get_next_line_cpy.h
+	rm fake_get_next_line.c
+	rm fake_get_next_line_utils.c
+
 else
 
 	cp ${PATH_GNL}/get_next_line.h get_next_line_cpy.h
@@ -60,61 +149,7 @@ else
 	echo "void *count_malloc(size_t size);" >> get_next_line_cpy.h
 	echo "void count_free(void *ptr);" >> get_next_line_cpy.h
 
-	compare_output() {
-		./tester $1 > gnl_output.txt
-		local temp=$(diff $1 gnl_output.txt)
-		if [[ -z "$temp" ]]; then
-			echo "SUCCESS $1"
-		elif [[ -n "$temp" ]]; then
-			echo "\033[0;31mFAILED: $1\033[0m"
-			echo >> results/result_log.txt
-			echo "Failed test $1 with buf size $2" >> results/result_log.txt
-			echo >> results/result_log.txt
-			diff -U 3 $1 gnl_output.txt >> results/result_log.txt
-			echo >> results/result_log.txt
-		fi
-		rm gnl_output.txt
-	}
-
-	echo "Testing basic input ..."
-	echo
-	for i in ${buf_sizes[@]}; do
-		gcc -o tester -Wall -Wextra -Werror -D BUFFER_SIZE=$i ${PATH_GNL}/get_next_line.c ${PATH_GNL}/get_next_line_utils.c $includes
-		echo "Tests with buf size $i"
-		echo
-		compare_output $dir/4-five $i
-		compare_output $dir/4-one $i
-		compare_output $dir/4-one-n $i
-		compare_output $dir/4-three $i
-		compare_output $dir/4-two $i
-		compare_output $dir/8-five $i
-		compare_output $dir/8-one $i
-		compare_output $dir/8-one-n $i
-		compare_output $dir/8-three $i
-		compare_output $dir/8-two $i
-		compare_output $dir/16-five $i
-		compare_output $dir/16-one $i
-		compare_output $dir/16-one-n $i
-		compare_output $dir/16-three $i
-		compare_output $dir/16-two $i
-		compare_output $dir/alpha-3ln $i
-		compare_output $dir/data $i
-		compare_output $dir/easy $i
-		compare_output $dir/empty $i
-		compare_output $dir/empty-then-char $i
-		compare_output $dir/libft.txt $i
-		compare_output $dir/lorem1 $i
-		compare_output $dir/lorem2 $i
-		compare_output $dir/nl-disaster $i
-		compare_output $dir/one-blank-line $i
-		compare_output $dir/standard $i
-		compare_output $dir/stuff $i
-		compare_output $dir/these-are-four-words $i
-		compare_output $dir/two-blank $i
-		compare_output $dir/wazzup $i
-		compare_output $dir/null-terminate $i
-		echo
-	done
+	basic_tests $GNL $GNL_UTILS
 
 	echo "Testing large files ..."
 	echo
@@ -275,6 +310,7 @@ else
 
 	echo
 	echo "Testing finished"
+	echo "To test in break malloc mode, run sh run_test.sh malloc"
 	echo "To test bonus, run sh run_tests.sh bonus"
 	echo "To see the differences in output, see result_log.txt in results/"
 

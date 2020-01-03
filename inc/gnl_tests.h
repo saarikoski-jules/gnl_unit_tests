@@ -30,6 +30,7 @@ void bonus_tests(int test_num);
 void *count_malloc(size_t size);
 void count_free(void *ptr);
 void *fake_malloc(size_t i);
+void *destroy_malloc(size_t i);
 void print_result(char *line);
 int	empty_gnl(int fd);
 

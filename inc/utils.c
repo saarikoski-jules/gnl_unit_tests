@@ -52,3 +52,18 @@ int		empty_gnl(int fd)
 		free(line);
 	return (ret);
 }
+
+void	*destroy_malloc(size_t i)
+{
+	void *ptr;
+	size_t j;
+
+	j = 0;
+	ptr = malloc(i);
+	while(j < i)
+	{
+		((char*)ptr)[j] = 'a';
+		j++;
+	}
+	return(ptr);
+}

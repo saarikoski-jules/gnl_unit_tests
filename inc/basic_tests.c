@@ -20,6 +20,12 @@ void basic_tests(int fd)
 			printf("\n");
 		free(line);
 	}
+	ret = get_next_line(fd, &line);
+	if (line != NULL)
+		printf("%s", line);
+	if (ret > 0)
+		printf("\n");
+	free(line);
 	if (ret != 0 && ret != 1)
 		printf("return value %d\n", ret);
 	close(fd);
