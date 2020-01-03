@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PATH_GNL="../gnl_aAAAAAAHHHHH/gnl_final"
+PATH_GNL="../crap_next_line"
 dir="inc/test_files"
 includes="inc/tests.c inc/bonus_tests.c inc/utils.c inc/basic_tests.c"
 
@@ -207,9 +207,9 @@ else
 	cp ${PATH_GNL}/get_next_line_utils.c fake_get_next_line_utils.c
 
 	sed -i '' 's/get_next_line.h/get_next_line_cpy.h/g' fake_get_next_line.c fake_get_next_line_utils.c
-	sed -i '' 's/malloc/fake_malloc/g' fake_get_next_line.c fake_get_next_line_utils.c
 
-	perl -pi -e 's/([\s\(\)])malloc\(/\1fake_malloc\(/g' fake_get_next_line.c fake_get_next_line_utils.c
+	perl -pi -e 's/([\s\(\)])malloc\(/\1fake_malloc\(/g' fake_get_next_line.c fake_get_next_line_utils.c	
+	
 	gcc -o tester -D BUFFER_SIZE=1 fake_get_next_line.c fake_get_next_line_utils.c $includes
 	rm fake_get_next_line.c
 	rm fake_get_next_line_utils.c
@@ -237,9 +237,11 @@ else
 	cp ${PATH_GNL}/get_next_line.c fake_get_next_line.c
 	cp ${PATH_GNL}/get_next_line_utils.c fake_get_next_line_utils.c
 
-	sed -i '' 's/malloc/count_malloc/g' fake_get_next_line.c fake_get_next_line_utils.c
-	sed -i '' 's/free/count_free/g' fake_get_next_line.c fake_get_next_line_utils.c
 	sed -i '' 's/get_next_line.h/get_next_line_cpy.h/g' fake_get_next_line.c fake_get_next_line_utils.c
+
+	perl -pi -e 's/([\s\(\)])malloc\(/\1count_malloc\(/g' fake_get_next_line.c fake_get_next_line_utils.c	
+	perl -pi -e 's/([\s\(\)])free\(/\1count_free\(/g' fake_get_next_line.c fake_get_next_line_utils.c	
+
 	
 
 	leak_check() {
