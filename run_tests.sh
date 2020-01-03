@@ -36,9 +36,6 @@ basic_tests() {
 			rm gnl_output.txt
 		}
 
-	echo $1
-	echo $2
-
 		echo "Testing basic input ..."
 		echo
 		for i in ${buf_sizes[@]}; do
