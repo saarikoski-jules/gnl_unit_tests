@@ -11,7 +11,9 @@ int main(int amt, char **args)
 	else if (amt == 2 && (strcmp("fd", args[1]) == 0))
 		invalid_fd_test();
 	else if (amt == 2 && (strcmp("neg", args[1]) == 0))
-		neg_buf_size_test();
+		neg_buff_size_test();
+	else if (amt == 2 && (strcmp("zero", args[1]) == 0))
+		zero_buff_size_test();
 	else if (amt == 2 && (strcmp("alloc", args[1]) == 0))
 		alloc_tests();
 	else if (amt == 4 && (strcmp("leaks", args[1]) == 0))

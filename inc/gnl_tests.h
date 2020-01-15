@@ -18,7 +18,8 @@ extern int g_free_amt;
 
 void basic_tests(int fd);
 void null_test();
-void neg_buf_size_test();
+void neg_buff_size_test();
+void zero_buff_size_test();
 void invalid_fd_test();
 void alloc_tests();
 void leak_test(char *arg, int buf_size);

@@ -171,88 +171,80 @@ else
 	echo "void *count_malloc(size_t size);" >> get_next_line_cpy.h
 	echo "void count_free(void *ptr);" >> get_next_line_cpy.h
 
-	basic_tests $GNL $GNL_UTILS
+	# basic_tests $GNL $GNL_UTILS
 
-	echo "${PURP}Running miscellaneous tests ...${RESET}"
-	echo
-	echo "${PINK}Testing large files ...${RESET}"
+	# echo "${PURP}Running miscellaneous tests ...${RESET}"
+	# echo
+	# echo "${PINK}Testing large files ...${RESET}"
 
-	compare_output $dir/bible $i
-	compare_output $dir/long-1x $i
-	compare_output $dir/long-3x $i
-	compare_output $dir/long-clear $i
-	compare_output $dir/doomed-to-fail $i
-	echo "${GREEN}All done!${RESET}"
+	# compare_output $dir/bible $i
+	# compare_output $dir/long-1x $i
+	# compare_output $dir/long-3x $i
+	# compare_output $dir/long-clear $i
+	# compare_output $dir/doomed-to-fail $i
+	# echo "${GREEN}All done!${RESET}"
 
-	gcc -o tester -Wall -Wextra -Werror -D BUFFER_SIZE=12 ${PATH_GNL}/get_next_line.c ${PATH_GNL}/get_next_line_utils.c $includes
+	# gcc -o tester -Wall -Wextra -Werror -D BUFFER_SIZE=12 ${PATH_GNL}/get_next_line.c ${PATH_GNL}/get_next_line_utils.c $includes
 
-	echo
-	echo "${PINK}Testing with bad line param ...${RESET}"
-	./tester null > gnl_output.txt
-	temp=$(diff $dir/empty gnl_output.txt)
-	if [[ -z "$temp" ]]; then
-		echo "${GREEN}SUCCESS${RESET} with NULL line param"
-	elif [[ -n "$temp" ]]; then
-		echo "${RED}FAILED${RESET} with NULL line param"
-		diff -U 3 $dir/empty gnl_output.txt >> results/result_log.txt
-	fi
-	rm gnl_output.txt
+	# echo
+	# echo "${PINK}Testing with bad line param ...${RESET}"
+	# ./tester null > gnl_output.txt
+	# temp=$(diff $dir/empty gnl_output.txt)
+	# if [[ -z "$temp" ]]; then
+	# 	echo "${GREEN}SUCCESS${RESET} with NULL line param"
+	# elif [[ -n "$temp" ]]; then
+	# 	echo "${RED}FAILED${RESET} with NULL line param"
+	# 	diff -U 3 $dir/empty gnl_output.txt >> results/result_log.txt
+	# fi
+	# rm gnl_output.txt
 
-	echo
-	echo "${PINK}Testing with stdin ...${RESET}"
-	cat $dir/easy | ./tester  > gnl_output.txt
-	temp=$(diff $dir/easy gnl_output.txt)
-	if [[ -z "$temp" ]]; then
-		echo "${GREEN}SUCCESS${RESET} with stdin"
-	elif [[ -n "$temp" ]]; then
-		echo "${RED}FAILED${RESET} with stdin"
-		diff -U 3 $dir/easy gnl_output.txt >> results/result_log.txt
-	fi
-	rm gnl_output.txt
+	# echo
+	# echo "${PINK}Testing with stdin ...${RESET}"
+	# cat $dir/easy | ./tester  > gnl_output.txt
+	# temp=$(diff $dir/easy gnl_output.txt)
+	# if [[ -z "$temp" ]]; then
+	# 	echo "${GREEN}SUCCESS${RESET} with stdin"
+	# elif [[ -n "$temp" ]]; then
+	# 	echo "${RED}FAILED${RESET} with stdin"
+	# 	diff -U 3 $dir/easy gnl_output.txt >> results/result_log.txt
+	# fi
+	# rm gnl_output.txt
+
+
+
+	test() {
+		./tester $1 > gnl_output.txt
+		local ERR=$?;
+		if [ $ERR -ne 0 ]; then
+			echo "${RED}FAILED${RESET} your code crashes"
+			echo "FAILED: crashes on $2" >> results/result_log.txt
+			echo
+		else
+			temp=$(diff $dir/empty gnl_output.txt)
+			if [[ -z "$temp" ]]; then
+				echo "${GREEN}SUCCESS${RESET}"
+				echo
+			elif [[ -n "$temp" ]]; then
+				echo "${RED}FAILED${RESET}"
+				echo
+				cat gnl_output.txt >> results/result_log.txt
+			fi
+		fi
+		rm gnl_output.txt
+	}
 
 	gcc -o tester -Wall -Wextra -Werror -D BUFFER_SIZE=0 ${PATH_GNL}/get_next_line.c ${PATH_GNL}/get_next_line_utils.c $includes
-
-	echo
+	echo "${PINK}Testing with bad fd ...${RESET}"
+	test "fd" "bad fd"
+	
+	gcc -o tester -Wall -Wextra -Werror -D BUFFER_SIZE=0 ${PATH_GNL}/get_next_line.c ${PATH_GNL}/get_next_line_utils.c $includes
 	echo "${PINK}Testing with buf size 0 ...${RESET}"
-	./tester $dir/4-five > gnl_output.txt
-	temp=$(diff $dir/empty gnl_output.txt)
-	if [[ -z "$temp" ]]; then
-		echo "${GREEN}SUCCESS${RESET} with buf size 0"
-	elif [[ -n "$temp" ]]; then
-		echo "${RED}FAILED${RESET} with buf size 0"
-		diff -U 3 $1 gnl_output.txt >> results/result_log.txt
-	fi
-	rm gnl_output.txt
+	test "zero" "buf size zero"
 
 	gcc -o tester -Wall -Wextra -Werror -D BUFFER_SIZE=-1 ${PATH_GNL}/get_next_line.c ${PATH_GNL}/get_next_line_utils.c $includes
-
-	echo
 	echo "${PINK}Testing with buf size -1 ...${RESET}"
-	./tester neg > gnl_output.txt
-	temp=$(diff $dir/empty gnl_output.txt)
-	if [[ -z "$temp" ]]; then
-		echo "${GREEN}SUCCESS${RESET} with buf size -1"
-	elif [[ -n "$temp" ]]; then
-		echo "${RED}FAILED${RESET} with buf size -1"
-		diff -U 3 $dir/empty gnl_output.txt >> results/result_log.txt
-	fi
-	rm gnl_output.txt
+	test "neg" "buf size -1"
 
-	gcc -o tester -Wall -Wextra -Werror -D BUFFER_SIZE=1 ${PATH_GNL}/get_next_line.c ${PATH_GNL}/get_next_line_utils.c $includes
-
-	echo
-	echo "${PINK}Testing with bad fd ...${RESET}"
-	./tester fd > gnl_output.txt
-	temp=$(diff $dir/empty gnl_output.txt)
-	if [[ -z "$temp" ]]; then
-		echo "${GREEN}SUCCESS${RESET} with bad fd"
-	elif [[ -n "$temp" ]]; then
-		echo "${RED}FAILED${RESET} with bad fd -1"
-		diff -U 3 $dir/empty gnl_output.txt >> results/result_log.txt
-	fi
-	rm gnl_output.txt
-
-	echo
 	echo "${PINK}Testing malloc protection ...${RESET}"
 
 	cp ${PATH_GNL}/get_next_line.c fake_get_next_line.c
@@ -265,64 +257,48 @@ else
 	gcc -o tester -D BUFFER_SIZE=1 fake_get_next_line.c fake_get_next_line_utils.c $includes
 	rm fake_get_next_line.c
 	rm fake_get_next_line_utils.c
+	test "alloc" "malloc protection"
+	
+	# echo "${PINK}Testing for memory leaks ...${RESET}"
 
-	./tester alloc > gnl_output.txt
-	ERR=$?;
-	if [ $ERR -ne 0 ]; then 
-		echo "${RED}FAILED${RESET} segfaults on malloc protection tests"
-		echo "FAILED segfaults on malloc protection tests" >> results/result_log.txt
-	else
-		temp=$(diff $dir/empty gnl_output.txt)
-		if [[ -z "$temp" ]]; then
-			echo "${GREEN}SUCCESS${RESET} with malloc protection"
-		elif [[ -n "$temp" ]]; then
-			echo "${RED}FAILED${RESET} Bad return value when malloc fails"
-			diff -U 3 $dir/empty gnl_output.txt >> results/result_log.txt
-		fi
-	fi
-	rm gnl_output.txt
+	# cp ${PATH_GNL}/get_next_line.c fake_get_next_line.c
+	# cp ${PATH_GNL}/get_next_line_utils.c fake_get_next_line_utils.c
 
-	echo
-	echo "${PINK}Testing for memory leaks ...${RESET}"
+	# sed -i '' 's/get_next_line.h/get_next_line_cpy.h/g' fake_get_next_line.c fake_get_next_line_utils.c
 
-	cp ${PATH_GNL}/get_next_line.c fake_get_next_line.c
-	cp ${PATH_GNL}/get_next_line_utils.c fake_get_next_line_utils.c
+	# perl -pi -e 's/([\s\(\)])malloc\(/\1count_malloc\(/g' fake_get_next_line.c fake_get_next_line_utils.c	
+	# perl -pi -e 's/([\s\(\)])free\(/\1count_free\(/g' fake_get_next_line.c fake_get_next_line_utils.c	
 
-	sed -i '' 's/get_next_line.h/get_next_line_cpy.h/g' fake_get_next_line.c fake_get_next_line_utils.c
+	# leak_check() {
+	# 	./tester leaks $1 $2>> gnl_output.txt
+	# }
 
-	perl -pi -e 's/([\s\(\)])malloc\(/\1count_malloc\(/g' fake_get_next_line.c fake_get_next_line_utils.c	
-	perl -pi -e 's/([\s\(\)])free\(/\1count_free\(/g' fake_get_next_line.c fake_get_next_line_utils.c	
+	# for i in ${buf_sizes[@]}; do
+	# 	gcc -o tester -D BUFFER_SIZE=$i fake_get_next_line.c fake_get_next_line_utils.c $includes
+	# 	leak_check $dir/4-five $i
+	# 	leak_check $dir/4-one-n $i
+	# 	leak_check $dir/8-one $i
+	# 	leak_check $dir/16-five $i
+	# 	leak_check $dir/alpha-3ln $i
+	# 	leak_check $dir/empty $i
+	# 	leak_check $dir/lorem2 $i
+	# 	leak_check $dir/nl-disaster $i
+	# 	leak_check $dir/these-are-four-words $i
+	# done
 
-	leak_check() {
-		./tester leaks $1 $2>> gnl_output.txt
-	}
+	# rm fake_get_next_line.c
+	# rm fake_get_next_line_utils.c
 
-	for i in ${buf_sizes[@]}; do
-		gcc -o tester -D BUFFER_SIZE=$i fake_get_next_line.c fake_get_next_line_utils.c $includes
-		leak_check $dir/4-five $i
-		leak_check $dir/4-one-n $i
-		leak_check $dir/8-one $i
-		leak_check $dir/16-five $i
-		leak_check $dir/alpha-3ln $i
-		leak_check $dir/empty $i
-		leak_check $dir/lorem2 $i
-		leak_check $dir/nl-disaster $i
-		leak_check $dir/these-are-four-words $i
-	done
+	# temp=$(diff $dir/empty gnl_output.txt)
+	# if [[ -z "$temp" ]]; then
+	# 	echo "${GREEN}SUCCESS${RESET}"
+	# elif [[ -n "$temp" ]]; then
+	# 	echo "${RED}FAILED${RESET}: Leaks found!"
+	# 	echo
+	# 	diff -U 3 $dir/empty gnl_output.txt >> results/result_log.txt
+	# fi
+	# rm gnl_output.txt
 
-	rm fake_get_next_line.c
-	rm fake_get_next_line_utils.c
-
-	temp=$(diff $dir/empty gnl_output.txt)
-	if [[ -z "$temp" ]]; then
-		echo "${GREEN}SUCCESS${RESET} No leaks found"
-	elif [[ -n "$temp" ]]; then
-		echo "${RED}FAILED${RESET}: Leaks found"
-		diff -U 3 $dir/empty gnl_output.txt >> results/result_log.txt
-	fi
-	rm gnl_output.txt
-
-	echo
 	echo "--<>-- ${GREEN}TESTING FINISHED${RESET} --<>--"
 	echo
 	echo "${PINK}To test in break malloc mode, run sh run_test.sh malloc${RESET}"
