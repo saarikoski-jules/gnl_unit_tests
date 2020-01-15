@@ -1,6 +1,6 @@
-#!/bin/bash
+#!/bin/sh
 
-PATH_GNL=".."
+PATH_GNL="../get_next_line"
 dir="inc/test_files"
 includes="inc/tests.c inc/bonus_tests.c inc/utils.c inc/basic_tests.c"
 
@@ -27,6 +27,15 @@ GREY="\x1b[38;5;244m"
 DGREY="\x1b[38;5;240m"
 RESET="\x1b[0m"
 
+echo "${PINK}   _____ _   _ _         _______ ______  _____ _______ ______ _____   ";
+echo "  / ____| \ | | |       |__   __|  ____|/ ____|__   __|  ____|  __ \  ";
+echo " | |  __|  \| | |  ______  | |  | |__  | (___    | |  | |__  | |__) | ";
+echo " | | |_ | . \ | | |______| | |  |  __|  \___ \   | |  |  __| |  _  /  ";
+echo " | |__| | |\  | |____      | |  | |____ ____) |  | |  | |____| | \ \  ";
+echo "  \_____|_| \_|______|     |_|  |______|_____/   |_|  |______|_|  \_\ ${RESET}";
+echo "                                             ${GREY}-jsaariko${RESET}";
+echo "                                                   ${DGREY}make-up by ldideric${RESET}";
+
 basic_tests() {
 		compare_output() {
 			./tester $1 > gnl_output.txt
@@ -41,15 +50,6 @@ basic_tests() {
 			fi
 			rm gnl_output.txt
 		}
-
-		echo "${PINK}   _____ _   _ _         _______ ______  _____ _______ ______ _____   ";
-		echo "  / ____| \ | | |       |__   __|  ____|/ ____|__   __|  ____|  __ \  ";
-		echo " | |  __|  \| | |  ______  | |  | |__  | (___    | |  | |__  | |__) | ";
-		echo " | | |_ | . \ | | |______| | |  |  __|  \___ \   | |  |  __| |  _  /  ";
-		echo " | |__| | |\  | |____      | |  | |____ ____) |  | |  | |____| | \ \  ";
-		echo "  \_____|_| \_|______|     |_|  |______|_____/   |_|  |______|_|  \_\ ${RESET}";
-		echo "                                             ${GREY}-jsaariko${RESET}";
-		echo "                                                   ${DGREY}make-up by ldideric${RESET}";
 
 		echo "${PURP}Testing basic input ...${RESET}"
 		echo
@@ -87,8 +87,8 @@ basic_tests() {
 			compare_output $dir/wazzup $i
 			compare_output $dir/null-terminate $i
 			echo "${GREEN}All done!${RESET}"
+			echo
 		done
-		echo 
 	}
 
 
@@ -125,7 +125,6 @@ if [[ "$*" == "bonus" ]]; then
 		echo
 	done
 
-	echo
 	echo "--<>-- ${GREEN}TESTING FINISHED${RESET} --<>--"
 	echo
 	echo "${PINK}To test basic input: sh run_tests.sh${RESET}"
@@ -155,6 +154,13 @@ elif [[ "$*" == "malloc" ]]; then
 	rm fake_get_next_line.c
 	rm fake_get_next_line_utils.c
 
+	echo "--<>-- ${GREEN}TESTING FINISHED${RESET} --<>--"
+	echo
+	echo "${PINK}To test in break malloc mode, run sh run_test.sh malloc${RESET}"
+	echo "${PINK}To test bonus, run sh run_tests.sh bonus${RESET}"
+	echo "${PINK}To see the differences in output, see result_log.txt in results/${RESET}"
+	echo
+
 else
 
 
@@ -167,7 +173,7 @@ else
 
 	basic_tests $GNL $GNL_UTILS
 
-	echo "${PURP}Testing miscellaneous tests ...${RESET}"
+	echo "${PURP}Running miscellaneous tests ...${RESET}"
 	echo
 	echo "${PINK}Testing large files ...${RESET}"
 
