@@ -30,7 +30,7 @@ void basic_tests(int fd)
 		printf("return value %d\n", ret);
 	close(fd);
 	if (get_next_line(fd, &line) != -1)
-		printf("Failed bad fd return value");
+		printf("Failed bad fd return value\n");
 }
 
 void null_test()
@@ -39,7 +39,7 @@ void null_test()
 
 	fd = open("test_files/standard", O_RDONLY);
 	if (get_next_line(fd, NULL) != -1)
-		printf("Failed with null line parameter");
+		printf("Bad return value with null line parameter\n");
 }
 
 void neg_buff_size_test()
