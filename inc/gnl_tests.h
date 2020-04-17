@@ -16,9 +16,10 @@ extern int g_count;
 extern int g_alloc_amt;
 extern int g_free_amt;
 
-void basic_tests(int fd);
+void basic_tests(int fd, int lc);
 void null_test();
 void neg_buf_size_test();
+void zero_buf_size_test();
 void invalid_fd_test();
 void alloc_tests();
 void leak_test(char *arg, int buf_size);
@@ -33,5 +34,7 @@ void *fake_malloc(size_t i);
 void *destroy_malloc(size_t i);
 void print_result(char *line);
 int	empty_gnl(int fd);
+int get_linecount(int fd);
+char *ft_test_strjoin(const char *str1, const char *str2);
 
 #endif

@@ -1,6 +1,6 @@
 #!/bin/sh
 
-PATH_GNL="../get_next_line"
+PATH_GNL="../crap_next_line"
 dir="inc/test_files"
 includes="inc/tests.c inc/bonus_tests.c inc/utils.c inc/basic_tests.c"
 
@@ -9,8 +9,8 @@ rm results/result_log_bonus.txt
 touch results/result_log.txt
 touch results/result_log_bonus.txt
 
-buf_sizes=(1 7 8 9 16 200 100000 2162)
-buf_sizes_bonus=(1 7 13 14 15 2162)
+buf_sizes="1 7 8 9 16 200 100000 2162"
+buf_sizes_bonus="1 7 13 14 15 2162"
 
 GNL="${PATH_GNL}/get_next_line.c"
 GNL_UTILS="${PATH_GNL}/get_next_line_utils.c"
@@ -19,28 +19,38 @@ F_GNL="fake_get_next_line.c"
 F_GNL_UTILS="fake_get_next_line_utils.c"
 
 #color codes
-GREEN="\x1b[38;5;83m"
-RED="\x1b[38;5;196m"
-PURP="\x1b[38;5;200m"
-PINK="\x1b[38;5;212m"
-GREY="\x1b[38;5;244m"
-DGREY="\x1b[38;5;240m"
-RESET="\x1b[0m"
+# GREEN="\x1b[38;5;83m"
+# RED="\x1b[38;5;196m"
+# PURP="\x1b[38;5;200m"
+# PINK="\x1b[38;5;212m"
+# GREY="\x1b[38;5;244m"
+# DGREY="\x1b[38;5;240m"
+# RESET="\x1b[0m"
 
-echo "${PINK}   _____ _   _ _         _______ ______  _____ _______ ______ _____   ";
-echo "  / ____| \ | | |       |__   __|  ____|/ ____|__   __|  ____|  __ \  ";
-echo " | |  __|  \| | |  ______  | |  | |__  | (___    | |  | |__  | |__) | ";
-echo " | | |_ | . \ | | |______| | |  |  __|  \___ \   | |  |  __| |  _  /  ";
-echo " | |__| | |\  | |____      | |  | |____ ____) |  | |  | |____| | \ \  ";
-echo "  \_____|_| \_|______|     |_|  |______|_____/   |_|  |______|_|  \_\ ${RESET}";
-echo "                                             ${GREY}-jsaariko${RESET}";
-echo "                                                   ${DGREY}make-up by ldideric${RESET}";
+#for linux
+GREEN=""
+RED=""
+PURP=""
+PINK=""
+GREY=""
+DGREY=""
+RESET=""
+
+
+# echo "${PINK}   _____ _   _ _         _______ ______  _____ _______ ______ _____   ";
+# echo "  / ____| \ | | |       |__   __|  ____|/ ____|__   __|  ____|  __ \  ";
+# echo " | |  __|  \| | |  ______  | |  | |__  | (___    | |  | |__  | |__) | ";
+# echo " | | |_ | . \ | | |______| | |  |  __|  \___ \   | |  |  __| |  _  /  ";
+# echo " | |__| | |\  | |____      | |  | |____ ____) |  | |  | |____| | \ \  ";
+# echo "  \_____|_| \_|______|     |_|  |______|_____/   |_|  |______|_|  \_\ ${RESET}";
+# echo "                                             ${GREY}-jsaariko${RESET}";
+# echo "                                                   ${DGREY}make-up by ldideric${RESET}";
 
 basic_tests() {
 		compare_output() {
 			./tester $1 > gnl_output.txt
-			local temp=$(diff $1 gnl_output.txt)
-			if [[ -n "$temp" ]]; then
+			temp=$(diff $1 gnl_output.txt)
+			if [ -n "$temp" ]; then
 				echo "${RED}FAILED${RESET}: $1"
 				echo >> results/result_log.txt
 				echo "Failed test $1 with buf size $2" >> results/result_log.txt
@@ -53,7 +63,7 @@ basic_tests() {
 
 		echo "${PURP}Testing basic input ...${RESET}"
 		echo
-		for i in ${buf_sizes[@]}; do
+		for i in $buf_sizes; do
 			gcc -o tester -Wall -Wextra -Werror -D BUFFER_SIZE=$i $1 $2 $includes
 			echo "${PINK}Tests with buf size $i${RESET}"
 			compare_output $dir/4-five $i
@@ -92,7 +102,7 @@ basic_tests() {
 	}
 
 
-if [[ "$*" == "bonus" ]]; then
+if [ '$*' = 'bonus' ];then
 	echo
 	echo "${PURP}Testing bonus${RESET}"
 	echo
@@ -101,10 +111,10 @@ if [[ "$*" == "bonus" ]]; then
 
 	compare_bonus() {
 		./tester bonus $1 > gnl_output.txt
-		local temp=$(diff -U 3 gnl_output.txt inc/bonus_results/test$1)
-		if [[ -z "$temp" ]]; then
+		temp=$(diff -U 3 gnl_output.txt inc/bonus_results/test$1)
+		if [ -z "$temp" ]; then
 			echo "${GREEN}SUCCESS${RESET} on bonus $1"
-		elif [[ -n "$temp" ]]; then
+		elif [ -n "$temp" ]; then
 			echo "${RED}FAILED${RESET} bonus $1"
 			echo >> results/result_log_bonus.txt
 			echo "Failed test $1 with buf size $2" >> results/result_log_bonus.txt
@@ -115,7 +125,7 @@ if [[ "$*" == "bonus" ]]; then
 		rm gnl_output.txt
 	}
 
-	for i in ${buf_sizes_bonus[@]}; do
+	for i in $buf_sizes_bonus; do
 		gcc -o tester -Wall -Wextra -Werror -D BUFFER_SIZE=$i -D BONUS ${PATH_GNL}/get_next_line_bonus.c ${PATH_GNL}/get_next_line_utils_bonus.c $includes
 		echo "${PINK}Bonus with buf size $i${RESET}"
 		compare_bonus 1 $i
@@ -133,7 +143,8 @@ if [[ "$*" == "bonus" ]]; then
 
 	rm get_next_line_bonus_cpy.h
 
-elif [[ "$*" == "malloc" ]]; then
+elif [ '$*' = 'malloc' ];
+then
 
 	echo
 	echo "${PURP}Running basic tests in destroy malloc mode ...${RESET}"
@@ -145,6 +156,7 @@ elif [[ "$*" == "malloc" ]]; then
 
 
 	sed -i '' 's/get_next_line.h/get_next_line_cpy.h/g' fake_get_next_line.c fake_get_next_line_utils.c
+
 
 	perl -pi -e 's/([\s\(\)])malloc\(/\1destroy_malloc\(/g' fake_get_next_line.c fake_get_next_line_utils.c	
 
@@ -165,7 +177,9 @@ else
 
 
 	cp ${PATH_GNL}/get_next_line.h get_next_line_cpy.h
-	sed -i '' 's/GET_NEXT_LINE_H/GET_NEXT_LINE_CPY_H/g' get_next_line_cpy.h
+	# sed --silent '13 s/GET_NEXT_LINE_H/GET_NEXT_LINE_CPY_H/' get_next_line_cpy.h
+	# sed --silent '14 s/GET_NEXT_LINE_H/GET_NEXT_LINE_CPY_H/' get_next_line_cpy.h
+	sed -i 's/GET_NEXT_LINE_H/GET_NEXT_LINE_CPY_H/g' get_next_line_cpy.h
 
 	echo "void *fake_malloc(size_t i);" >> get_next_line_cpy.h
 	echo "void *count_malloc(size_t size);" >> get_next_line_cpy.h
@@ -190,9 +204,9 @@ else
 	echo "${PINK}Testing with bad line param ...${RESET}"
 	./tester null > gnl_output.txt
 	temp=$(diff $dir/empty gnl_output.txt)
-	if [[ -z "$temp" ]]; then
+	if [ -z "$temp" ]; then
 		echo "${GREEN}SUCCESS${RESET} with NULL line param"
-	elif [[ -n "$temp" ]]; then
+	elif [ -n "$temp" ]; then
 		echo "${RED}FAILED${RESET} with NULL line param"
 		diff -U 3 $dir/empty gnl_output.txt >> results/result_log.txt
 	fi
@@ -202,9 +216,9 @@ else
 	echo "${PINK}Testing with stdin ...${RESET}"
 	cat $dir/easy | ./tester  > gnl_output.txt
 	temp=$(diff $dir/easy gnl_output.txt)
-	if [[ -z "$temp" ]]; then
+	if [ -z "$temp" ]; then
 		echo "${GREEN}SUCCESS${RESET} with stdin"
-	elif [[ -n "$temp" ]]; then
+	elif [ -n "$temp" ]; then
 		echo "${RED}FAILED${RESET} with stdin"
 		diff -U 3 $dir/easy gnl_output.txt >> results/result_log.txt
 	fi
@@ -214,13 +228,13 @@ else
 
 	echo
 	echo "${PINK}Testing with buf size 0 ...${RESET}"
-	./tester $dir/4-five > gnl_output.txt
+	./tester zero > gnl_output.txt
 	temp=$(diff $dir/empty gnl_output.txt)
-	if [[ -z "$temp" ]]; then
+	if [ -z "$temp" ]; then
 		echo "${GREEN}SUCCESS${RESET} with buf size 0"
-	elif [[ -n "$temp" ]]; then
+	elif [ -n "$temp" ]; then
 		echo "${RED}FAILED${RESET} with buf size 0"
-		diff -U 3 $1 gnl_output.txt >> results/result_log.txt
+		diff -U 3 $dir/empty gnl_output.txt >> results/result_log.txt
 	fi
 	rm gnl_output.txt
 
@@ -230,9 +244,9 @@ else
 	echo "${PINK}Testing with buf size -1 ...${RESET}"
 	./tester neg > gnl_output.txt
 	temp=$(diff $dir/empty gnl_output.txt)
-	if [[ -z "$temp" ]]; then
+	if [ -z "$temp" ]; then
 		echo "${GREEN}SUCCESS${RESET} with buf size -1"
-	elif [[ -n "$temp" ]]; then
+	elif [ -n "$temp" ]; then
 		echo "${RED}FAILED${RESET} with buf size -1"
 		diff -U 3 $dir/empty gnl_output.txt >> results/result_log.txt
 	fi
@@ -244,9 +258,9 @@ else
 	echo "${PINK}Testing with bad fd ...${RESET}"
 	./tester fd > gnl_output.txt
 	temp=$(diff $dir/empty gnl_output.txt)
-	if [[ -z "$temp" ]]; then
+	if [ -z "$temp" ]; then
 		echo "${GREEN}SUCCESS${RESET} with bad fd"
-	elif [[ -n "$temp" ]]; then
+	elif [ -n "$temp" ]; then
 		echo "${RED}FAILED${RESET} with bad fd -1"
 		diff -U 3 $dir/empty gnl_output.txt >> results/result_log.txt
 	fi
@@ -258,7 +272,8 @@ else
 	cp ${PATH_GNL}/get_next_line.c fake_get_next_line.c
 	cp ${PATH_GNL}/get_next_line_utils.c fake_get_next_line_utils.c
 
-	sed -i '' 's/get_next_line.h/get_next_line_cpy.h/g' fake_get_next_line.c fake_get_next_line_utils.c
+	sed -i 's/#include "get_next_line.h"/#include "get_next_line_cpy.h"/g' fake_get_next_line.c fake_get_next_line_utils.c
+	# sed -i '' 's/get_next_line.h/get_next_line_cpy.h/g' fake_get_next_line.c fake_get_next_line_utils.c
 
 	perl -pi -e 's/([\s\(\)])malloc\(/\1fake_malloc\(/g' fake_get_next_line.c fake_get_next_line_utils.c	
 	
@@ -273,9 +288,9 @@ else
 		echo "FAILED segfaults on malloc protection tests" >> results/result_log.txt
 	else
 		temp=$(diff $dir/empty gnl_output.txt)
-		if [[ -z "$temp" ]]; then
+		if [ -z "$temp" ]; then
 			echo "${GREEN}SUCCESS${RESET} with malloc protection"
-		elif [[ -n "$temp" ]]; then
+		elif [ -n "$temp" ]; then
 			echo "${RED}FAILED${RESET} Bad return value when malloc fails"
 			diff -U 3 $dir/empty gnl_output.txt >> results/result_log.txt
 		fi
@@ -288,7 +303,7 @@ else
 	cp ${PATH_GNL}/get_next_line.c fake_get_next_line.c
 	cp ${PATH_GNL}/get_next_line_utils.c fake_get_next_line_utils.c
 
-	sed -i '' 's/get_next_line.h/get_next_line_cpy.h/g' fake_get_next_line.c fake_get_next_line_utils.c
+	sed -i 's/get_next_line.h/get_next_line_cpy.h/g' fake_get_next_line.c fake_get_next_line_utils.c
 
 	perl -pi -e 's/([\s\(\)])malloc\(/\1count_malloc\(/g' fake_get_next_line.c fake_get_next_line_utils.c	
 	perl -pi -e 's/([\s\(\)])free\(/\1count_free\(/g' fake_get_next_line.c fake_get_next_line_utils.c	
@@ -297,7 +312,7 @@ else
 		./tester leaks $1 $2>> gnl_output.txt
 	}
 
-	for i in ${buf_sizes[@]}; do
+	for i in $buf_sizes; do
 		gcc -o tester -D BUFFER_SIZE=$i fake_get_next_line.c fake_get_next_line_utils.c $includes
 		leak_check $dir/4-five $i
 		leak_check $dir/4-one-n $i
@@ -314,9 +329,9 @@ else
 	rm fake_get_next_line_utils.c
 
 	temp=$(diff $dir/empty gnl_output.txt)
-	if [[ -z "$temp" ]]; then
+	if [ -z "$temp" ]; then
 		echo "${GREEN}SUCCESS${RESET} No leaks found"
-	elif [[ -n "$temp" ]]; then
+	elif [ -n "$temp" ]; then
 		echo "${RED}FAILED${RESET}: Leaks found"
 		diff -U 3 $dir/empty gnl_output.txt >> results/result_log.txt
 	fi
