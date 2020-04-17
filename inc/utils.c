@@ -67,3 +67,31 @@ void	*destroy_malloc(size_t i)
 	}
 	return(ptr);
 }
+
+char	*ft_test_strjoin(char const *s1, char const *s2)
+{
+	char	*new;
+	int		i;
+	int		j;
+
+	if (s1 == NULL || s2 == NULL)
+		return (NULL);
+	new = (char *)malloc((strlen(s1) + strlen(s2) + 1) * sizeof(char));
+	if (new == NULL)
+		return (NULL);
+	i = 0;
+	while (s1[i] != '\0')
+	{
+		new[i] = s1[i];
+		i++;
+	}
+	j = 0;
+	while (s2[j] != '\0')
+	{
+		new[i] = s2[j];
+		j++;
+		i++;
+	}
+	new[i] = '\0';
+	return (new);
+}

@@ -5,20 +5,42 @@ int g_free_amt = 0;
 int g_tofail = -1;
 int g_count = 0;
 
-void basic_tests(int fd)
+void basic_tests(int fd, int lc)
 {
 	int ret;
 	char *line;
 	ret = 1;
 	line = NULL;
-	while(ret == 1)
+	int i = 0;
+
+	if (lc != -1)
 	{
-		ret = get_next_line(fd, &line);
-		if (line != NULL)
-			printf("%s", line);
-		if (ret > 0)
-			printf("\n");
-		free(line);
+		while (i < lc)
+		{
+			ret = get_next_line(fd, &line);
+			if (line != NULL)
+				printf("%s", line);
+			if (ret > 0)
+				printf("\n");
+			free(line);
+			if (ret != 1)
+				i = lc + 1;
+			i++;
+		}
+		if (i != lc)
+			printf("\nbad amount of lines read i: %d, lc: %d\n", i, lc);
+	}
+	else
+	{
+		while (ret == 1)
+		{
+			ret = get_next_line(fd, &line);
+			if (line != NULL)
+				printf("%s", line);
+			if (ret > 0)
+				printf("\n");
+			free(line);
+		}
 	}
 	ret = get_next_line(fd, &line);
 	if (line != NULL)
@@ -40,6 +62,22 @@ void null_test()
 	fd = open("test_files/standard", O_RDONLY);
 	if (get_next_line(fd, NULL) != -1)
 		printf("Failed with null line parameter");
+}
+
+void zero_buf_size_test()
+{
+	char *line;
+
+	line = NULL;
+	int fd = open("test_files/standard", O_RDONLY);
+	int ret = get_next_line(fd, &line);
+	if (line != NULL)
+	{
+		if (line[0] != '\0')
+			printf("Failed with negative buf size line");
+	}
+	if ((ret != -1 && ret != 0))
+		printf("Failed with negative buf size");
 }
 
 void neg_buf_size_test()
@@ -64,8 +102,6 @@ void invalid_fd_test()
 void alloc_tests()
 {
 	int fd1;
-	char *line;
-	line = NULL;
 	int i;
 	int ret;
 
