@@ -214,7 +214,7 @@ else
 
 	echo
 	echo "${PINK}Testing with buf size 0 ...${RESET}"
-	./tester $dir/4-five > gnl_output.txt
+	./tester zero > gnl_output.txt
 	temp=$(diff $dir/empty gnl_output.txt)
 	if [[ -z "$temp" ]]; then
 		echo "${GREEN}SUCCESS${RESET} with buf size 0"
